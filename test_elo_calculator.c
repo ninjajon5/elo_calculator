@@ -1,20 +1,24 @@
-#include "../utils/test.h"
+#include "test/test.h"
+#include "elo_calculator.h"
 #include <stdio.h>
 #include <string.h>
 
 
 int test_print_prints_file_contents( void ) {
     FILE *original_stdout = stdout ;
-    FILE *temp_file = tmpfile() ;
-
-    stdout = temp_file ;
+    char temp_filename[] = "test_output.tmp" ;
+    
+    freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
     elo_print( "test/test_input.csv" ) ;
-    stdout = original_stdout ;
+    fflush( stdout ) ; // forces the buffer to output right now
+    freopen( "CON", "w", stdout ) ; // redirect stdout to console
 
-    rewind( temp_file ) ; // Go to start of file
+    FILE *read_file = fopen( temp_filename, "r" ) ;
     char buffer[ 100 ] ;
-    fgets( buffer, sizeof(buffer), temp_file ) ;
-    fclose( temp_file ) ;
+    fgets( buffer, sizeof(buffer), read_file ) ;
+    fclose( read_file ) ;
+
+    remove( temp_filename ) ;
 
     TASSERT( 
         strcmp( buffer, "test input\n" ) == 0,
@@ -27,6 +31,7 @@ int test_print_prints_file_contents( void ) {
 
 
 test_function tests[] = {
+    test_print_prints_file_contents
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
