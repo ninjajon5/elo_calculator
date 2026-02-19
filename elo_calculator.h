@@ -1,6 +1,6 @@
 #ifndef ELO_CALCULATOR_H
 #define ELO_CALCULATOR_H
 
-void elo_print( char *path ) ;
+void print_data( char *path ) ;
 
 #endif

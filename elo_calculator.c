@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void elo_print( char *path ) {
+void print_data( char *path ) {
     FILE *input_file ;
     char buffer[ 100 ] ;
 

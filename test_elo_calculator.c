@@ -9,7 +9,7 @@ int test_print_prints_file_contents( void ) {
     char temp_filename[] = "test_output.tmp" ;
     
     freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
-    elo_print( "test/test_input.csv" ) ;
+    print_data( "test/test_input.csv" ) ;
     fflush( stdout ) ; // forces the buffer to output right now
     freopen( "CON", "w", stdout ) ; // redirect stdout to console
 
