@@ -1,5 +1,6 @@
 #include "test/test.h"
 #include "elo_calculator.h"
+#include "utils/dict.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -9,7 +10,7 @@ int test_print_prints_file_contents( void ) {
     char temp_filename[] = "test_output.tmp" ;
     
     freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
-    print_data( "test/test_input.csv" ) ;
+    print_data( "test/test_single_input.csv" ) ;
     fflush( stdout ) ; // forces the buffer to output right now
     freopen( "CON", "w", stdout ) ; // redirect stdout to console
 
@@ -28,6 +29,19 @@ int test_print_prints_file_contents( void ) {
     return 1 ;
 }
 
+// int test_single_win_affects_elo( void ) {
+//     struct dict elos = calculate_elos( "test_single_input.csv" ) ;
+//     int p1_elo = *(int*)dict_get( &elos, "p1" ) ;
+//     int p2_elo = *(int*)dict_get( &elos, "p2" ) ;
+
+//     TASSERT( 
+//         p1_elo > p2_elo,
+//         "p1_elo not greater than p2_elo"
+//     ) ;
+
+//     dict_free( &elos ) ;
+//     return 1 ;
+// }
 
 
 test_function tests[] = {
