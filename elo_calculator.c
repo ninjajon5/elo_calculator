@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "utils/dict.h"
+#include "utils/sarr.h"
 
 void print_data( char *path ) {
     FILE *input_file ;
@@ -12,35 +13,28 @@ void print_data( char *path ) {
     fclose( input_file ) ;
 }
 
-// struct dict calculate_elos( char *path ) {
-//     struct dict data ;
-//     struct dict elos ;
-//     dict_init( &data ) ;
-//     dict_init( &elos ) ;
+void print_headers( char *path ) {
+    FILE *data_file ;
+    char line[ 32 ] ;
 
-//     FILE *data_file = fopen( path, "r" ) ;
-//     char line[ 1024 ] ;
-//     int linecount = 0 ;
+    data_file = fopen( path, "r" ) ;
+    fgets( line, sizeof( line ), data_file ) ;
 
-//     while( fgets( line, sizeof line, data_file ) != NULL ) {
-//         if( linecount == 0 ) {
-//             // assign columns as database dict keys
-//             printf( "line length: %d", strlen( line ) ) ;
-//             for( int i = 0 ; i < strlen( line ) ; i++ ) {
-//                 char *current_entry ;
+    char *character = &line[0] ;
+    while( *character != '\0' ) {
+        if( *character == ',' || *character == '\n' ) {
+            *character = '\0' ;
+        }
+        character++ ;
+    }
 
-//             }
-//         } else {
-//             // assign values to database dict
-//         }
-//     }
+    char *header_1 = &line[0] ;
+    char *header_2 = &line[3] ;
+    printf( "%s; %s", header_1, header_2 ) ;
 
-//     fclose( data_file ) ;
-//     dict_free( &data ) ;
-
-//     return elos ;
-// }
+    fclose( data_file ) ;
+}
 
 // int main( void ) {
-//     elo_print( "test/test_input.csv" ) ;
+//     print_headers( "test/test_win_loss.csv" ) ;
 // }

@@ -29,27 +29,39 @@ int test_print_prints_file_contents( void ) {
     return 1 ;
 }
 
-// int test_single_win_affects_elo( void ) {
-//     struct dict elos = calculate_elos( "test_single_input.csv" ) ;
-//     int p1_elo = *(int*)dict_get( &elos, "p1" ) ;
-//     int p2_elo = *(int*)dict_get( &elos, "p2" ) ;
+int test_print_headers_returns_headers( void ) {
+    FILE *original_stdout = stdout ;
+    char temp_filename[] = "test_output.tmp" ;
+    
+    freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
+    print_headers( "test/test_win_loss.csv" ) ;
+    fflush( stdout ) ; // forces the buffer to output right now
+    freopen( "CON", "w", stdout ) ; // redirect stdout to console
 
-//     TASSERT( 
-//         p1_elo > p2_elo,
-//         "p1_elo not greater than p2_elo"
-//     ) ;
+    FILE *read_file = fopen( temp_filename, "r" ) ;
+    char buffer[ 100 ] ;
+    fgets( buffer, sizeof(buffer), read_file ) ;
+    fclose( read_file ) ;
 
-//     dict_free( &elos ) ;
-//     return 1 ;
-// }
+    remove( temp_filename ) ;
+
+    TASSERT( 
+        strcmp( buffer, "p1; p2" ) == 0,
+        "Expected to print 'p1; p2'"
+    ) ;
+
+    return 1 ;
+}
 
 
 test_function tests[] = {
-    test_print_prints_file_contents
+    test_print_prints_file_contents,
+    test_print_headers_returns_headers
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
 int main( void ) {
     run_tests( tests, test_count ) ;
+    // print_headers( "test/test_win_loss.csv" ) ;
     return 0 ;
 }

@@ -4,6 +4,6 @@
 #include "utils/dict.h"
 
 void print_data( char *path ) ;
-struct dict calculate_elos( char *path ) ;
+void print_headers( char *path ) ;
 
 #endif
