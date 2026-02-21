@@ -3,6 +3,8 @@
 #include "utils/dict.h"
 #include "utils/sarr.h"
 
+struct sarr get_headers( char *path ) ;
+
 void print_data( char *path ) {
     FILE *input_file ;
     char buffer[ 100 ] ;
@@ -15,6 +17,14 @@ void print_data( char *path ) {
 }
 
 void print_headers( char *path ) {
+    struct sarr headers = get_headers( path ) ;
+    for( int i = 0 ; i < headers.len ; i++ ) {
+        printf( "%s; ", (char*)headers.contents[i] ) ;
+    }
+    sarr_free( &headers ) ;
+}
+
+struct sarr get_headers( char *path ) {
     FILE *data_file ;
     char line[ 32 ] ;
     struct sarr headers ;
@@ -36,11 +46,8 @@ void print_headers( char *path ) {
         character++ ;
     }
 
-    for( int i = 0 ; i < headers.len ; i++ ) {
-        printf( "%s; ", (char*)headers.contents[i] ) ;
-    }
-
-    fclose( data_file ) ;
+    fclose( data_file ) ;  
+    return headers ;
 }
 
 // int main( void ) {

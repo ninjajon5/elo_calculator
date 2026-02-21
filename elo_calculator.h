@@ -5,5 +5,6 @@
 
 void print_data( char *path ) ;
 void print_headers( char *path ) ;
+struct sarr get_headers( char *path ) ;
 
 #endif
