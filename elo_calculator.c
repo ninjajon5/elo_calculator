@@ -4,6 +4,7 @@
 #include "utils/sarr.h"
 
 struct sarr get_headers( char *path ) ;
+struct sarr _divide_csv( FILE *csv ) ;
 
 void print_data( char *path ) {
     FILE *input_file ;
@@ -25,13 +26,18 @@ void print_headers( char *path ) {
 }
 
 struct sarr get_headers( char *path ) {
-    FILE *data_file ;
+    FILE *data_file = fopen( path, "r" ) ;
+    struct sarr headers = _divide_csv( data_file ) ;
+    fclose( data_file ) ;  
+    return headers ;
+}
+
+struct sarr _divide_csv( FILE *csv ) {
     char line[ 32 ] ;
     struct sarr headers ;
     sarr_init( &headers, 8 ) ;
 
-    data_file = fopen( path, "r" ) ;
-    fgets( line, sizeof( line ), data_file ) ;
+    fgets( line, sizeof( line ), csv ) ;
 
     char *character = line ; // pointer to first character in line[]
     int header_index = 0 ;
@@ -45,8 +51,7 @@ struct sarr get_headers( char *path ) {
         }
         character++ ;
     }
-
-    fclose( data_file ) ;  
+ 
     return headers ;
 }
 
