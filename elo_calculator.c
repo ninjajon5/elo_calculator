@@ -4,7 +4,7 @@
 #include "utils/sarr.h"
 
 struct sarr get_headers( char *path ) ;
-struct sarr _divide_csv( FILE *csv ) ;
+struct sarr _divide_csv_into_headers( FILE *csv ) ;
 
 void print_data( char *path ) {
     FILE *input_file ;
@@ -27,20 +27,20 @@ void print_headers( char *path ) {
 
 struct sarr get_headers( char *path ) {
     FILE *data_file = fopen( path, "r" ) ;
-    struct sarr headers = _divide_csv( data_file ) ;
+    struct sarr headers = _divide_csv_into_headers( data_file ) ;
     fclose( data_file ) ;  
     return headers ;
 }
 
-struct sarr _divide_csv( FILE *csv ) {
+struct sarr _divide_csv_into_headers( FILE *csv ) {
     char line[ 32 ] ;
-    struct sarr headers ;
-    sarr_init( &headers, 8 ) ;
+    fgets( line, sizeof( line ), csv ) ; // store first line in line[]
 
-    fgets( line, sizeof( line ), csv ) ;
+    struct sarr headers ;
+    sarr_init( &headers, 8 ) ; // initialise sarr to store header strings
 
     char *character = line ; // pointer to first character in line[]
-    int header_index = 0 ;
+    int header_index = 0 ; // tracker for index in line[] of start of header strings
 
     while( *character != '\0' ) {
         if( *character == ',' || *character == '\n' ) {
