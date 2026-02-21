@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-int test_print_prints_file_contents( void ) {
+int _1_test_print_prints_file_contents( void ) {
     FILE *original_stdout = stdout ;
     char temp_filename[] = "test_output.tmp" ;
     
@@ -29,12 +29,12 @@ int test_print_prints_file_contents( void ) {
     return 1 ;
 }
 
-int test_print_headers_returns_headers( void ) {
+int _2_test_print_headers_returns_headers( void ) {
     FILE *original_stdout = stdout ;
     char temp_filename[] = "test_output.tmp" ;
     
     freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
-    print_headers( "test/test_win_loss.csv" ) ;
+    print_headers( "test/test_two_headers.csv" ) ;
     fflush( stdout ) ; // forces the buffer to output right now
     freopen( "CON", "w", stdout ) ; // redirect stdout to console
 
@@ -53,10 +53,34 @@ int test_print_headers_returns_headers( void ) {
     return 1 ;
 }
 
+int _3_test_print_headers_returns_more_headers( void ) {
+    FILE *original_stdout = stdout ;
+    char temp_filename[] = "test_output.tmp" ;
+    
+    freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
+    print_headers( "test/test_three_headers.csv" ) ;
+    fflush( stdout ) ; // forces the buffer to output right now
+    freopen( "CON", "w", stdout ) ; // redirect stdout to console
+
+    FILE *read_file = fopen( temp_filename, "r" ) ;
+    char buffer[ 100 ] ;
+    fgets( buffer, sizeof(buffer), read_file ) ;
+    fclose( read_file ) ;
+
+    remove( temp_filename ) ;
+
+    TASSERT( 
+        strcmp( buffer, "p1; player2; result" ) == 0,
+        "Expected to print 'p1; player2; result'"
+    ) ;
+
+    return 1 ;
+}
 
 test_function tests[] = {
-    test_print_prints_file_contents,
-    test_print_headers_returns_headers
+    _1_test_print_prints_file_contents,
+    _2_test_print_headers_returns_headers,
+    _3_test_print_headers_returns_more_headers
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
