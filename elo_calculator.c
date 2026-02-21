@@ -11,8 +11,10 @@ void print_data( char *path ) {
     char buffer[ 100 ] ;
 
     input_file = fopen( path, "r" ) ;
-    fgets( buffer, sizeof( buffer ), input_file ) ;
-    printf( "%s", buffer ) ;
+
+    while( fgets( buffer, sizeof( buffer ), input_file ) != NULL ) {
+        printf( "%s", buffer ) ;
+    }
 
     fclose( input_file ) ;
 }
