@@ -23,18 +23,16 @@ void print_headers( char *path ) {
     data_file = fopen( path, "r" ) ;
     fgets( line, sizeof( line ), data_file ) ;
 
-    char *character = &line[0] ;
+    char *character = line ; // pointer to first character in line[]
     int header_index = 0 ;
-    int current_index = 0;
 
     while( *character != '\0' ) {
         if( *character == ',' || *character == '\n' ) {
-            *character = '\0' ;
-            char *header = &line[ header_index ] ;
-            sarr_append( &headers, header, strlen( header ) + 1 ) ;
-            header_index = current_index + 1 ;
+            *character = '\0' ; // replace ',' or '\n' with '\0'
+            char *header = &line[ header_index ] ; // header is pointer to first character in this sections
+            sarr_append( &headers, header, strlen( header ) + 1 ) ; // add header string to sarr
+            header_index = ( character - line ) + 1 ; // move to one after the newly-created '\0'
         }
-        current_index++ ;
         character++ ;
     }
 
