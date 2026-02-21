@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "utils/dict.h"
 #include "utils/sarr.h"
 
@@ -16,21 +17,30 @@ void print_data( char *path ) {
 void print_headers( char *path ) {
     FILE *data_file ;
     char line[ 32 ] ;
+    struct sarr headers ;
+    sarr_init( &headers, 8 ) ;
 
     data_file = fopen( path, "r" ) ;
     fgets( line, sizeof( line ), data_file ) ;
 
     char *character = &line[0] ;
+    int header_index = 0 ;
+    int current_index = 0;
+
     while( *character != '\0' ) {
         if( *character == ',' || *character == '\n' ) {
             *character = '\0' ;
+            char *header = &line[ header_index ] ;
+            sarr_append( &headers, header, strlen( header ) + 1 ) ;
+            header_index = current_index + 1 ;
         }
+        current_index++ ;
         character++ ;
     }
 
-    char *header_1 = &line[0] ;
-    char *header_2 = &line[3] ;
-    printf( "%s; %s", header_1, header_2 ) ;
+    for( int i = 0 ; i < headers.len ; i++ ) {
+        printf( "%s; ", (char*)headers.contents[i] ) ;
+    }
 
     fclose( data_file ) ;
 }

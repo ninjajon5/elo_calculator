@@ -46,8 +46,8 @@ int _2_test_print_headers_returns_headers( void ) {
     remove( temp_filename ) ;
 
     TASSERT( 
-        strcmp( buffer, "p1; p2" ) == 0,
-        "Expected to print 'p1; p2'"
+        strcmp( buffer, "p1; p2; " ) == 0,
+        "Expected to print 'p1; p2; '"
     ) ;
 
     return 1 ;
@@ -70,8 +70,8 @@ int _3_test_print_headers_returns_more_headers( void ) {
     remove( temp_filename ) ;
 
     TASSERT( 
-        strcmp( buffer, "p1; player2; result" ) == 0,
-        "Expected to print 'p1; player2; result'"
+        strcmp( buffer, "p1; player2; result; " ) == 0,
+        "Expected to print 'p1; player2; result; '"
     ) ;
 
     return 1 ;
@@ -86,6 +86,6 @@ int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
 int main( void ) {
     run_tests( tests, test_count ) ;
-    // print_headers( "test/test_win_loss.csv" ) ;
+    // print_headers( "test/test_three_headers.csv" ) ;
     return 0 ;
 }
