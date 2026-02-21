@@ -1,5 +1,10 @@
 #include <stdio.h>
+#include <string.h>
 #include "utils/dict.h"
+#include "utils/sarr.h"
+
+struct sarr get_headers( char *path ) ;
+struct sarr _divide_csv_into_headers( FILE *csv ) ;
 
 void print_data( char *path ) {
     FILE *input_file ;
@@ -12,35 +17,44 @@ void print_data( char *path ) {
     fclose( input_file ) ;
 }
 
-// struct dict calculate_elos( char *path ) {
-//     struct dict data ;
-//     struct dict elos ;
-//     dict_init( &data ) ;
-//     dict_init( &elos ) ;
+void print_headers( char *path ) {
+    struct sarr headers = get_headers( path ) ;
+    for( int i = 0 ; i < headers.len ; i++ ) {
+        printf( "%s; ", (char*)headers.contents[i] ) ;
+    }
+    sarr_free( &headers ) ;
+}
 
-//     FILE *data_file = fopen( path, "r" ) ;
-//     char line[ 1024 ] ;
-//     int linecount = 0 ;
+struct sarr get_headers( char *path ) {
+    FILE *data_file = fopen( path, "r" ) ;
+    struct sarr headers = _divide_csv_into_headers( data_file ) ;
+    fclose( data_file ) ;  
+    return headers ;
+}
 
-//     while( fgets( line, sizeof line, data_file ) != NULL ) {
-//         if( linecount == 0 ) {
-//             // assign columns as database dict keys
-//             printf( "line length: %d", strlen( line ) ) ;
-//             for( int i = 0 ; i < strlen( line ) ; i++ ) {
-//                 char *current_entry ;
+struct sarr _divide_csv_into_headers( FILE *csv ) {
+    char line[ 32 ] ;
+    fgets( line, sizeof( line ), csv ) ; // store first line in line[]
 
-//             }
-//         } else {
-//             // assign values to database dict
-//         }
-//     }
+    struct sarr headers ;
+    sarr_init( &headers, 8 ) ; // initialise sarr to store header strings
 
-//     fclose( data_file ) ;
-//     dict_free( &data ) ;
+    char *character = line ; // pointer to first character in line[]
+    int header_index = 0 ; // tracker for index in line[] of start of header strings
 
-//     return elos ;
-// }
+    while( *character != '\0' ) {
+        if( *character == ',' || *character == '\n' ) {
+            *character = '\0' ; // replace ',' or '\n' with '\0'
+            char *header = &line[ header_index ] ; // header is pointer to first character in this sections
+            sarr_append( &headers, header, strlen( header ) + 1 ) ; // add header string to sarr
+            header_index = ( character - line ) + 1 ; // move to one after the newly-created '\0'
+        }
+        character++ ;
+    }
+ 
+    return headers ;
+}
 
 // int main( void ) {
-//     elo_print( "test/test_input.csv" ) ;
+//     print_headers( "test/test_win_loss.csv" ) ;
 // }
