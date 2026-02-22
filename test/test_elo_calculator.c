@@ -1,6 +1,7 @@
 #include "../utils/test.h"
 #include "../elo_calculator.h"
 #include "../utils/dict.h"
+#include "../utils/sarr.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -114,6 +115,8 @@ int _5_test_load_data_dict_keys_contains_header( void ) {
         dict_has_key( &data, "p1" ),
         "Expected 'p1' as data dict key"
     ) ;
+
+    dict_free( &data ) ;
     return 1 ;
 }
 
@@ -124,6 +127,24 @@ int _6_test_load_data_dict_values_contains_data( void ) {
         strcmp( (char*)dict_get( &data, "p1" ), "11" ) == 0,
         "Expected 'p1' data to be '11'"
     ) ;
+
+    dict_free( &data ) ;
+    return 1 ;
+}
+
+int _7_test_load_data_dict_values_contain_sarr_of_datapoints( void ) {
+    struct dict _load_data( char *path ) ;
+    struct dict data = _load_data( "test_two_data_rows.csv" ) ;
+
+    struct sarr *p1_data = (struct sarr*)dict_get( &data, "p1" ) ;
+    char *p1_datapoint_2 = (char*)p1_data->contents[1] ;
+
+    TASSERT(
+        strcmp( p1_datapoint_2, "5" ) == 0,
+        "Expected 'p1' second datapoint to be '5'"
+    ) ;
+
+    dict_free( &data ) ;
     return 1 ;
 }
 

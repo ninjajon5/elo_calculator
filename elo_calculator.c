@@ -10,7 +10,7 @@ struct sarr _divide_csv_line_into_strings( char *line ) ;
 
 void print_data( char *path ) {
     FILE *input_file ;
-    char buffer[ 100 ] ;
+    char buffer[ 256 ] ;
 
     input_file = fopen( path, "r" ) ;
 
