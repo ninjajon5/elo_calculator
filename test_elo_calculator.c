@@ -117,13 +117,24 @@ int _5_test_load_data_dict_keys_contains_header( void ) {
     return 1 ;
 }
 
+int _6_test_load_data_dict_values_contains_data( void ) {
+    struct dict _load_data( char *path ) ;
+    struct dict data = _load_data( "test/test_three_headers.csv" ) ;
+    TASSERT(
+        *(int*)dict_get( &data, "p1" ) == 11,
+        "Expected 'p1' data to be 11"
+    ) ;
+    return 1 ;
+}
+
 
 test_function tests[] = {
     _1_test_print_prints_file_contents,
     _2_test_print_headers_returns_headers,
     _3_test_print_headers_returns_more_headers,
     _4_test_print_file_prints_all_lines,
-    _5_test_load_data_dict_keys_contains_header
+    _5_test_load_data_dict_keys_contains_header,
+    _6_test_load_data_dict_values_contains_data
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
