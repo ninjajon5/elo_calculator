@@ -155,7 +155,8 @@ test_function tests[] = {
     _3_test_print_headers_returns_more_headers,
     _4_test_print_file_prints_all_lines,
     _5_test_load_data_dict_keys_contains_header,
-    _6_test_load_data_dict_values_contains_data
+    _6_test_load_data_dict_values_contains_data,
+    _7_test_load_data_dict_values_contain_sarr_of_datapoints
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
