@@ -3,8 +3,10 @@
 #include "utils/dict.h"
 #include "utils/sarr.h"
 
+void _load_data_lines( struct dict *data, FILE *data_file ) ;
+void _load_data_line( struct dict *data, char *line, int *linecount ) ;
 struct sarr _get_headers( char *path ) ;
-struct sarr _divide_csv_into_headers( FILE *csv ) ;
+struct sarr _divide_csv_line_into_strings( char *line ) ;
 
 void print_data( char *path ) {
     FILE *input_file ;
@@ -30,40 +32,61 @@ void print_headers( char *path ) {
 struct dict _load_data( char *path ) {
     struct dict data ;
     dict_init( &data ) ;
-    data.keys = _get_headers( path ) ;
 
+    FILE *data_file = fopen( path, "r" ) ;
+    _load_data_lines( &data, data_file ) ;
+
+    fclose( data_file ) ;
     return data ;
+}
+
+void _load_data_lines( struct dict *data, FILE *data_file ) {
+    int linecount = 0 ;
+    char line[ 256 ] ;
+    while( fgets( line, sizeof( line ), data_file ) != NULL ) {
+        _load_data_line( data, line, &linecount ) ;
+    }
+}
+
+void _load_data_line( struct dict *data, char *line, int *linecount ) {
+    struct sarr line_data = _divide_csv_line_into_strings( line ) ;
+    if( (*linecount)++ == 0 ) { // increment linecount after check
+        data->keys = line_data ;
+    } else {
+        data->values = line_data ;
+    }
 }
 
 struct sarr _get_headers( char *path ) {
     FILE *data_file = fopen( path, "r" ) ;
-    struct sarr headers = _divide_csv_into_headers( data_file ) ;
+
+    char line[ 256 ] ;
+    fgets( line, sizeof( line ), data_file ) ; // store first line in line[]
+
+    struct sarr headers = _divide_csv_line_into_strings( line ) ;
+
     fclose( data_file ) ;  
-    
     return headers ;
 }
 
-struct sarr _divide_csv_into_headers( FILE *csv ) {
-    char line[ 32 ] ;
-    fgets( line, sizeof( line ), csv ) ; // store first line in line[]
-
-    struct sarr headers ;
-    sarr_init( &headers, 8 ) ; // initialise sarr to store header strings
+struct sarr _divide_csv_line_into_strings( char *line ) {
+    struct sarr strings ;
+    sarr_init( &strings, 8 ) ; // initialise sarr to store strings
 
     char *character = line ; // pointer to first character in line[]
-    int header_index = 0 ; // tracker for index in line[] of start of header strings
+    int string_index = 0 ; // tracker for index in line[] of start of strings
 
     while( *character != '\0' ) {
         if( *character == ',' || *character == '\n' ) {
             *character = '\0' ; // replace ',' or '\n' with '\0'
-            char *header = &line[ header_index ] ; // header is pointer to first character in this sections
-            sarr_append( &headers, header, strlen( header ) + 1 ) ; // add header string to sarr
-            header_index = ( character - line ) + 1 ; // move to one after the newly-created '\0'
+            char *string = &line[ string_index ] ; // string is pointer to first character in this section
+            sarr_append( &strings, string, strlen( string ) + 1 ) ; // add string to sarr
+            string_index = ( character - line ) + 1 ; // move to one after the newly-created '\0'
         }
         character++ ;
     }
  
-    return headers ;
+    return strings ;
 }
 
 // int main( void ) {
