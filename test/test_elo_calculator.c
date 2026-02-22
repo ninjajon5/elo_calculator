@@ -121,8 +121,8 @@ int _6_test_load_data_dict_values_contains_data( void ) {
     struct dict _load_data( char *path ) ;
     struct dict data = _load_data( "test_three_headers.csv" ) ;
     TASSERT(
-        *(int*)dict_get( &data, "p1" ) == 11,
-        "Expected 'p1' data to be 11"
+        strcmp( (char*)dict_get( &data, "p1" ), "11" ) == 0,
+        "Expected 'p1' data to be '11'"
     ) ;
     return 1 ;
 }
