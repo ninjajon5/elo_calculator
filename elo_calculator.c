@@ -5,6 +5,8 @@
 
 void _load_data_lines( struct dict *data, FILE *data_file ) ;
 void _load_data_line( struct dict *data, char *line, int *linecount ) ;
+void _load_headers_into_keys( struct dict *data, struct sarr *line_data ) ;
+void _append_datapoints_into_values( struct dict *data, struct sarr *line_data ) ;
 struct sarr _get_headers( char *path ) ;
 struct sarr _divide_csv_line_into_strings( char *line ) ;
 
@@ -51,9 +53,37 @@ void _load_data_lines( struct dict *data, FILE *data_file ) {
 void _load_data_line( struct dict *data, char *line, int *linecount ) {
     struct sarr line_data = _divide_csv_line_into_strings( line ) ;
     if( (*linecount)++ == 0 ) { // increment linecount after check
-        data->keys = line_data ;
+        _load_headers_into_keys( data, &line_data ) ;
     } else {
-        data->values = line_data ;
+        _append_datapoints_into_values( data, &line_data ) ;
+    }
+}
+
+void _load_headers_into_keys( struct dict *data, struct sarr *line_data ) {
+    for( int i = 0 ; i < line_data->len ; i++ ) {
+        char *header = (char*)line_data->contents[i] ;
+
+        struct sarr *empty_data = malloc( sizeof( struct sarr ) ) ; // on heap, so not overwritten by subsequent loops
+        sarr_init( empty_data, 16 ) ;
+
+        dict_add( // each header is added as a key paired to an empty sarr
+            data,
+            header, empty_data,
+            strlen( header ) + 1, sizeof( struct sarr )
+        ) ;
+    }
+}
+
+void _append_datapoints_into_values( struct dict *data, struct sarr *line_data ) {
+    if( line_data-> len != data->keys.len ) {
+        fprintf( stderr, "line data has different element count to data dict keys" ) ;
+        exit( 1 ) ;
+    }
+
+    for( int i = 0 ; i < data->values.len ; i++ ) { // never go beyond length of data.values
+        char *datapoint = (char*)line_data->contents[i] ;
+        struct sarr *data_sarr = (struct sarr*)data->values.contents[i] ;
+        sarr_append( data_sarr, datapoint, strlen( datapoint ) + 1 ) ;
     }
 }
 

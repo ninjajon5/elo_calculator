@@ -116,6 +116,11 @@ int _5_test_load_data_dict_keys_contains_header( void ) {
         "Expected 'p1' as data dict key"
     ) ;
 
+    for( int i = 0 ; i < data.values.len ; i++ ) {
+        struct sarr *nested_sarr = (struct sarr*)data.values.contents[i] ;
+        sarr_free( nested_sarr ) ;
+        free( nested_sarr ) ;
+    }
     dict_free( &data ) ;
     return 1 ;
 }
@@ -123,11 +128,20 @@ int _5_test_load_data_dict_keys_contains_header( void ) {
 int _6_test_load_data_dict_values_contains_data( void ) {
     struct dict _load_data( char *path ) ;
     struct dict data = _load_data( "test_three_headers.csv" ) ;
+
+    struct sarr *p1_data = (struct sarr*)dict_get( &data, "p1" ) ;
+    char *p1_datapoint_1 = (char*)p1_data->contents[0] ;
+
     TASSERT(
-        strcmp( (char*)dict_get( &data, "p1" ), "11" ) == 0,
-        "Expected 'p1' data to be '11'"
+        strcmp( p1_datapoint_1, "11" ) == 0,
+        "Expected 'p1' second datapoint to be '11'"
     ) ;
 
+    for( int i = 0 ; i < data.values.len ; i++ ) {
+        struct sarr *nested_sarr = (struct sarr*)data.values.contents[i] ;
+        sarr_free( nested_sarr ) ;
+        free( nested_sarr ) ;
+    }
     dict_free( &data ) ;
     return 1 ;
 }
@@ -147,6 +161,7 @@ int _7_test_load_data_dict_values_contain_sarr_of_datapoints( void ) {
     for( int i = 0 ; i < data.values.len ; i++ ) {
         struct sarr *nested_sarr = (struct sarr*)data.values.contents[i] ;
         sarr_free( nested_sarr ) ;
+        free( nested_sarr ) ;
     }
     dict_free( &data ) ;
     return 1 ;
