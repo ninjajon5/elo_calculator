@@ -3,7 +3,7 @@
 #include "utils/dict.h"
 #include "utils/sarr.h"
 
-struct sarr get_headers( char *path ) ;
+struct sarr _get_headers( char *path ) ;
 struct sarr _divide_csv_into_headers( FILE *csv ) ;
 
 void print_data( char *path ) {
@@ -20,17 +20,26 @@ void print_data( char *path ) {
 }
 
 void print_headers( char *path ) {
-    struct sarr headers = get_headers( path ) ;
+    struct sarr headers = _get_headers( path ) ;
     for( int i = 0 ; i < headers.len ; i++ ) {
         printf( "%s; ", (char*)headers.contents[i] ) ;
     }
     sarr_free( &headers ) ;
 }
 
-struct sarr get_headers( char *path ) {
+struct dict _load_data( char *path ) {
+    struct dict data ;
+    dict_init( &data ) ;
+    data.keys = _get_headers( path ) ;
+
+    return data ;
+}
+
+struct sarr _get_headers( char *path ) {
     FILE *data_file = fopen( path, "r" ) ;
     struct sarr headers = _divide_csv_into_headers( data_file ) ;
     fclose( data_file ) ;  
+    
     return headers ;
 }
 

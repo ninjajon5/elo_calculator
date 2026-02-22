@@ -107,8 +107,9 @@ int _4_test_print_file_prints_all_lines( void ) {
     return 1 ;
 }
 
-int _5_test_data_dict_keys_contains_headers( void ) {
-    struct dict data = load_data( "test/test_three_headers.csv" ) ;
+int _5_test_load_data_dict_keys_contains_header( void ) {
+    struct dict _load_data( char *path ) ;
+    struct dict data = _load_data( "test/test_three_headers.csv" ) ;
     TASSERT(
         dict_has_key( &data, "p1" ),
         "Expected 'p1' as data dict key"
@@ -121,7 +122,8 @@ test_function tests[] = {
     _1_test_print_prints_file_contents,
     _2_test_print_headers_returns_headers,
     _3_test_print_headers_returns_more_headers,
-    _4_test_print_file_prints_all_lines
+    _4_test_print_file_prints_all_lines,
+    _5_test_load_data_dict_keys_contains_header
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
