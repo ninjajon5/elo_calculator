@@ -144,6 +144,10 @@ int _7_test_load_data_dict_values_contain_sarr_of_datapoints( void ) {
         "Expected 'p1' second datapoint to be '5'"
     ) ;
 
+    for( int i = 0 ; i < data.values.len ; i++ ) {
+        struct sarr *nested_sarr = (struct sarr*)data.values.contents[i] ;
+        sarr_free( nested_sarr ) ;
+    }
     dict_free( &data ) ;
     return 1 ;
 }
