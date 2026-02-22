@@ -6,6 +6,15 @@
 #include <string.h>
 
 
+void free_dict_with_nested_sarrs( struct dict *dict ) {
+    for( int i = 0 ; i < dict->values.len ; i++ ) {
+        struct sarr *nested_sarr = (struct sarr*)dict->values.contents[i] ;
+        sarr_free( nested_sarr ) ;
+        free( nested_sarr ) ;
+    }
+    dict_free( dict ) ;
+}
+
 int _1_test_print_prints_file_contents( void ) {
     FILE *original_stdout = stdout ;
     char temp_filename[] = "test_output.tmp" ;
@@ -116,12 +125,7 @@ int _5_test_load_data_dict_keys_contains_header( void ) {
         "Expected 'p1' as data dict key"
     ) ;
 
-    for( int i = 0 ; i < data.values.len ; i++ ) {
-        struct sarr *nested_sarr = (struct sarr*)data.values.contents[i] ;
-        sarr_free( nested_sarr ) ;
-        free( nested_sarr ) ;
-    }
-    dict_free( &data ) ;
+    free_dict_with_nested_sarrs( &data ) ;
     return 1 ;
 }
 
@@ -137,12 +141,7 @@ int _6_test_load_data_dict_values_contains_data( void ) {
         "Expected 'p1' second datapoint to be '11'"
     ) ;
 
-    for( int i = 0 ; i < data.values.len ; i++ ) {
-        struct sarr *nested_sarr = (struct sarr*)data.values.contents[i] ;
-        sarr_free( nested_sarr ) ;
-        free( nested_sarr ) ;
-    }
-    dict_free( &data ) ;
+    free_dict_with_nested_sarrs( &data ) ;
     return 1 ;
 }
 
@@ -158,12 +157,24 @@ int _7_test_load_data_dict_values_contain_sarr_of_datapoints( void ) {
         "Expected 'p1' second datapoint to be '5'"
     ) ;
 
-    for( int i = 0 ; i < data.values.len ; i++ ) {
-        struct sarr *nested_sarr = (struct sarr*)data.values.contents[i] ;
-        sarr_free( nested_sarr ) ;
-        free( nested_sarr ) ;
-    }
-    dict_free( &data ) ;
+    free_dict_with_nested_sarrs( &data ) ;
+    return 1 ;
+}
+
+int _8_test_elo_init_returns_starting_elos( void ) {
+    struct elo_calculator test_elo ;
+    elo_init( &test_elo, 1000 ) ;
+
+    elo_load_data( &test_elo, "test_named_players.csv" ) ;
+
+    int p1_elo = *(int*)dict_get( &test_elo.elos, "p1" ) ;
+
+    TASSERT(
+        p1_elo >= 1000,
+        "Expected player 1 elo to exceed starting elo"
+    ) ;
+
+    elo_free( &test_elo ) ;
     return 1 ;
 }
 
@@ -175,7 +186,8 @@ test_function tests[] = {
     _4_test_print_file_prints_all_lines,
     _5_test_load_data_dict_keys_contains_header,
     _6_test_load_data_dict_values_contains_data,
-    _7_test_load_data_dict_values_contain_sarr_of_datapoints
+    _7_test_load_data_dict_values_contain_sarr_of_datapoints,
+    _8_test_elo_init_returns_starting_elos
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
