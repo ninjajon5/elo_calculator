@@ -92,7 +92,6 @@ struct sarr _get_headers( char *path ) {
 
     char line[ 256 ] ;
     fgets( line, sizeof( line ), data_file ) ; // store first line in line[]
-
     struct sarr headers = _divide_csv_line_into_strings( line ) ;
 
     fclose( data_file ) ;  
