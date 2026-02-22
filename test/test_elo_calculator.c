@@ -1,6 +1,6 @@
-#include "test/test.h"
-#include "elo_calculator.h"
-#include "utils/dict.h"
+#include "../utils/test.h"
+#include "../elo_calculator.h"
+#include "../utils/dict.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -10,7 +10,7 @@ int _1_test_print_prints_file_contents( void ) {
     char temp_filename[] = "test_output.tmp" ;
     
     freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
-    print_data( "test/test_single_input.csv" ) ;
+    print_data( "test_single_input.csv" ) ;
     fflush( stdout ) ; // forces the buffer to output right now
     freopen( "CON", "w", stdout ) ; // redirect stdout to console
 
@@ -34,7 +34,7 @@ int _2_test_print_headers_returns_headers( void ) {
     char temp_filename[] = "test_output.tmp" ;
     
     freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
-    print_headers( "test/test_two_headers.csv" ) ;
+    print_headers( "test_two_headers.csv" ) ;
     fflush( stdout ) ; // forces the buffer to output right now
     freopen( "CON", "w", stdout ) ; // redirect stdout to console
 
@@ -58,7 +58,7 @@ int _3_test_print_headers_returns_more_headers( void ) {
     char temp_filename[] = "test_output.tmp" ;
     
     freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
-    print_headers( "test/test_three_headers.csv" ) ;
+    print_headers( "test_three_headers.csv" ) ;
     fflush( stdout ) ; // forces the buffer to output right now
     freopen( "CON", "w", stdout ) ; // redirect stdout to console
 
@@ -82,7 +82,7 @@ int _4_test_print_file_prints_all_lines( void ) {
     char temp_filename[] = "test_output.tmp" ;
     
     freopen( temp_filename, "w", stdout ) ; // write a file with temp_filename, and redirect stdout to it
-    print_data( "test/test_three_headers.csv" ) ;
+    print_data( "test_three_headers.csv" ) ;
     fflush( stdout ) ; // forces the buffer to output right now
     freopen( "CON", "w", stdout ) ; // redirect stdout to console
 
@@ -109,7 +109,7 @@ int _4_test_print_file_prints_all_lines( void ) {
 
 int _5_test_load_data_dict_keys_contains_header( void ) {
     struct dict _load_data( char *path ) ;
-    struct dict data = _load_data( "test/test_three_headers.csv" ) ;
+    struct dict data = _load_data( "test_three_headers.csv" ) ;
     TASSERT(
         dict_has_key( &data, "p1" ),
         "Expected 'p1' as data dict key"
@@ -119,7 +119,7 @@ int _5_test_load_data_dict_keys_contains_header( void ) {
 
 int _6_test_load_data_dict_values_contains_data( void ) {
     struct dict _load_data( char *path ) ;
-    struct dict data = _load_data( "test/test_three_headers.csv" ) ;
+    struct dict data = _load_data( "test_three_headers.csv" ) ;
     TASSERT(
         *(int*)dict_get( &data, "p1" ) == 11,
         "Expected 'p1' data to be 11"
