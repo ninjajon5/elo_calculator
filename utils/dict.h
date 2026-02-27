@@ -19,5 +19,6 @@ void dict_add( struct dict *dict, char *key, void *value, size_t key_size, size_
 void* dict_get( struct dict *dict, char *input_key ) ;
 int dict_has_key( struct dict *dict, char *input_key ) ;
 void dict_free( struct dict *dict ) ;
+void dict_free_with_nested_sarrs( struct dict *dict ) ;
 
 #endif

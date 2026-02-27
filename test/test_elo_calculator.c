@@ -2,10 +2,9 @@
 #include "../elo_calculator.h"
 #include "../utils/dict.h"
 #include "../utils/sarr.h"
+#include "../utils/IO.h"
 #include <stdio.h>
 #include <string.h>
-
-
 
 int _1_test_print_prints_file_contents( void ) {
     FILE *original_stdout = stdout ;
@@ -110,20 +109,20 @@ int _4_test_print_file_prints_all_lines( void ) {
 }
 
 int _5_test_load_data_dict_keys_contains_header( void ) {
-    struct dict _load_data( char *path ) ;
-    struct dict data = _load_data( "test_three_headers.csv" ) ;
+    struct dict load_data( char *path ) ;
+    struct dict data = load_data( "test_three_headers.csv" ) ;
     TASSERT(
         dict_has_key( &data, "p1" ),
         "Expected 'p1' as data dict key"
     ) ;
 
-    free_dict_with_nested_sarrs( &data ) ;
+    dict_free_with_nested_sarrs( &data ) ;
     return 1 ;
 }
 
 int _6_test_load_data_dict_values_contains_data( void ) {
-    struct dict _load_data( char *path ) ;
-    struct dict data = _load_data( "test_three_headers.csv" ) ;
+    struct dict load_data( char *path ) ;
+    struct dict data = load_data( "test_three_headers.csv" ) ;
 
     struct sarr *p1_data = (struct sarr*)dict_get( &data, "p1" ) ;
     char *p1_datapoint_1 = (char*)p1_data->contents[0] ;
@@ -133,13 +132,13 @@ int _6_test_load_data_dict_values_contains_data( void ) {
         "Expected 'p1' second datapoint to be '11'"
     ) ;
 
-    free_dict_with_nested_sarrs( &data ) ;
+    dict_free_with_nested_sarrs( &data ) ;
     return 1 ;
 }
 
 int _7_test_load_data_dict_values_contain_sarr_of_datapoints( void ) {
-    struct dict _load_data( char *path ) ;
-    struct dict data = _load_data( "test_two_data_rows.csv" ) ;
+    struct dict load_data( char *path ) ;
+    struct dict data = load_data( "test_two_data_rows.csv" ) ;
 
     struct sarr *p1_data = (struct sarr*)dict_get( &data, "p1" ) ;
     char *p1_datapoint_2 = (char*)p1_data->contents[1] ;
@@ -149,7 +148,7 @@ int _7_test_load_data_dict_values_contain_sarr_of_datapoints( void ) {
         "Expected 'p1' second datapoint to be '5'"
     ) ;
 
-    free_dict_with_nested_sarrs( &data ) ;
+    dict_free_with_nested_sarrs( &data ) ;
     return 1 ;
 }
 

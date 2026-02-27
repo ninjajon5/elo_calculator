@@ -36,6 +36,15 @@ void dict_free( struct dict *dict ) {
     sarr_free( &dict->values ) ;
 }
 
+void dict_free_with_nested_sarrs( struct dict *dict ) {
+    for( int i = 0 ; i < dict->values.len ; i++ ) {
+        struct sarr *nested_sarr = (struct sarr*)dict->values.contents[i] ;
+        sarr_free( nested_sarr ) ;
+        free( nested_sarr ) ; // _load_headers_into_keys uses malloc()
+    }
+    dict_free( dict ) ;
+}
+
 int _dict_find_key_index( struct dict *dict, char *input_key ) {
     for ( int i = 0 ; i < dict->keys.len ; i++ ) {
         char *key = (char*)dict->keys.contents[i] ;
