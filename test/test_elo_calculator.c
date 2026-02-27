@@ -6,14 +6,6 @@
 #include <string.h>
 
 
-void free_dict_with_nested_sarrs( struct dict *dict ) {
-    for( int i = 0 ; i < dict->values.len ; i++ ) {
-        struct sarr *nested_sarr = (struct sarr*)dict->values.contents[i] ;
-        sarr_free( nested_sarr ) ;
-        free( nested_sarr ) ;
-    }
-    dict_free( dict ) ;
-}
 
 int _1_test_print_prints_file_contents( void ) {
     FILE *original_stdout = stdout ;
@@ -163,15 +155,16 @@ int _7_test_load_data_dict_values_contain_sarr_of_datapoints( void ) {
 
 int _8_test_elo_init_returns_starting_elos( void ) {
     struct elo_calculator test_elo ;
-    elo_init( &test_elo, 1000 ) ;
+    elo_init( &test_elo ) ;
 
     elo_load_data( &test_elo, "test_named_players.csv" ) ;
+    elo_calculate( &test_elo, 1000.0f ) ;
 
-    int p1_elo = *(int*)dict_get( &test_elo.elos, "p1" ) ;
+    float name_A_elo = *(float*)dict_get( &test_elo.elos, "Name A" ) ;
 
     TASSERT(
-        p1_elo >= 1000,
-        "Expected player 1 elo to exceed starting elo"
+        name_A_elo >= 1000.0f,
+        "Expected Name A elo to exceed starting elo"
     ) ;
 
     elo_free( &test_elo ) ;
