@@ -17,7 +17,7 @@ void elo_load_data( struct elo_calculator *elo, char *path ) {
     elo->data = load_data( path ) ;
 }
 
-void elo_calculate( struct elo_calculator *elo, float starting_elo, float diff_factor, float k ) {
+void elo_calculate_from_data( struct elo_calculator *elo, float starting_elo, float diff_factor, float k ) {
     int number_of_data_rows = _elo_get_number_of_data_rows( elo ) ;
     for( int i = 0 ; i < number_of_data_rows ; i++ ) {
         struct sarr p1_sarr = *(struct sarr*)dict_get( &elo->data, "p1" ) ;
