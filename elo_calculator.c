@@ -43,26 +43,21 @@ struct elo_config _elo_config_init( float starting_elo, float diff_factor, float
 }
 
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, int row_number ) {
-    struct sarr p1_sarr = *(struct sarr*)dict_get( &elo->data, "p1" ) ;
-    char *p1_name = (char*)p1_sarr.contents[row_number] ;
+    char *player_headers[2] = { "p1", "p2" } ;
+    char *player_names[2] ;
 
-    if( dict_has_key( &elo->elos, p1_name ) == 0 ) {
-        dict_add( 
-            &elo->elos, 
-            p1_name, &config->starting_elo,
-            strlen( p1_name ) + 1, sizeof( config->starting_elo )
-        ) ;
-    }
+    for( int i = 0 ; i < 2 ; i ++ ) {
+        char *player_header = player_headers[i] ;
+        struct sarr player_sarr = *(struct sarr*)dict_get( &elo->data, player_header ) ;
+        player_names[i] = (char*)player_sarr.contents[row_number] ;
 
-    struct sarr p2_sarr = *(struct sarr*)dict_get( &elo->data, "p2" ) ;
-    char *p2_name = (char*)p2_sarr.contents[row_number] ;
-
-    if( dict_has_key( &elo->elos, p2_name ) == 0 ) {
-        dict_add( 
-            &elo->elos, 
-            p2_name, &config->starting_elo,
-            strlen( p2_name ) + 1, sizeof( config->starting_elo )
-        ) ;
+        if( dict_has_key( &elo->elos, player_names[i] ) == 0 ) {
+            dict_add( 
+                &elo->elos, 
+                player_names[i], &config->starting_elo,
+                strlen( player_names[i] ) + 1, sizeof( config->starting_elo )
+            ) ;
+        }
     }
 
     float p1_result = 0.0f ;
@@ -71,14 +66,14 @@ void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_conf
     struct sarr winner_sarr = *(struct sarr*)dict_get( &elo->data, "winner" ) ;
     char *winner = (char*)winner_sarr.contents[row_number] ;
 
-    if( strcmp( p1_name, winner ) == 0 ) {
+    if( strcmp( player_names[0], winner ) == 0 ) {
         p1_result += 1.0f ;
     } else {
         p2_result += 1.0f ;
     }
 
-    float *p1_elo = (float*)dict_get( &elo->elos, p1_name ) ;
-    float *p2_elo = (float*)dict_get( &elo->elos, p2_name ) ;
+    float *p1_elo = (float*)dict_get( &elo->elos, player_names[0] ) ;
+    float *p2_elo = (float*)dict_get( &elo->elos, player_names[1] ) ;
 
     float exponent = ( ( *p2_elo - *p1_elo ) / config->diff_factor ) ;
     float denominator = powf( 10.0f, exponent ) ;
