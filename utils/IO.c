@@ -76,7 +76,6 @@ void _load_headers_into_keys( struct dict *data, struct sarr *line_data ) {
 
 void _append_datapoints_into_values( struct dict *data, struct sarr *line_data ) {
     if( line_data-> len != data->keys.len ) {
-        fprintf( stderr, "line data has different element count to data dict keys" ) ;
         exit( 1 ) ;
     }
 

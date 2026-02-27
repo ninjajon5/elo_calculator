@@ -42,7 +42,12 @@ void dict_free_with_nested_sarrs( struct dict *dict ) {
         sarr_free( nested_sarr ) ;
         free( nested_sarr ) ; // _load_headers_into_keys uses malloc()
     }
-    dict_free( dict ) ;
+    // can't call dict_free because we've done a special case of _sarr_free_each_element above, and dict_free would therefore double-free
+    sarr_free( &dict->keys ) ;  
+    free( dict->values.contents ) ;
+    dict->values.contents = NULL ;
+    dict->values.capacity = 0 ;
+    dict->values.len = 0 ;
 }
 
 int _dict_find_key_index( struct dict *dict, char *input_key ) {

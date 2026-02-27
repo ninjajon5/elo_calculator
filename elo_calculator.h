@@ -14,6 +14,11 @@ struct elo_config {
     float k ;
 } ;
 
+struct elo_data_row {
+    char *player_names[2] ;
+    char *winner ;
+} ;
+
 void elo_init( struct elo_calculator *elo ) ;
 void elo_load_data( struct elo_calculator *elo, char *path ) ;
 void elo_calculate_from_data( struct elo_calculator *elo, float starting_elo, float diff_factor, float k ) ;
