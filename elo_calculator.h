@@ -4,9 +4,14 @@
 #include "utils/dict.h"
 
 struct elo_calculator {
-    int starting_elo ;
     struct dict data ;
     struct dict elos ;
+} ;
+
+struct elo_config {
+    float starting_elo ;
+    float diff_factor ;
+    float k ;
 } ;
 
 void elo_init( struct elo_calculator *elo ) ;
