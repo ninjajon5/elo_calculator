@@ -9,6 +9,7 @@
 int _elo_get_number_of_data_rows( struct elo_calculator *elo ) ;
 struct elo_config _elo_config_init( float starting_elo, float diff_factor, float k ) ;
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, int row_number ) ;
+void _elo_get_player_names_from_row( char *player_names[2], struct elo_calculator *elo, int row_number ) ;
 
 void elo_init( struct elo_calculator *elo ) {
     dict_init( &elo->data ) ;
@@ -43,14 +44,10 @@ struct elo_config _elo_config_init( float starting_elo, float diff_factor, float
 }
 
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, int row_number ) {
-    char *player_headers[2] = { "p1", "p2" } ;
     char *player_names[2] ;
+    _elo_get_player_names_from_row( player_names, elo, row_number ) ;
 
     for( int i = 0 ; i < 2 ; i ++ ) {
-        char *player_header = player_headers[i] ;
-        struct sarr player_sarr = *(struct sarr*)dict_get( &elo->data, player_header ) ;
-        player_names[i] = (char*)player_sarr.contents[row_number] ;
-
         if( dict_has_key( &elo->elos, player_names[i] ) == 0 ) {
             dict_add( 
                 &elo->elos, 
@@ -86,6 +83,16 @@ void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_conf
 
     *p1_elo += p1_elo_change ;
     *p2_elo += p2_elo_change ;
+}
+
+void _elo_get_player_names_from_row( char *player_names[2], struct elo_calculator *elo, int row_number ) {
+    char *player_headers[2] = { "p1", "p2" } ;
+
+    for( int i = 0 ; i < 2 ; i ++ ) {
+        char *player_header = player_headers[i] ;
+        struct sarr player_sarr = *(struct sarr*)dict_get( &elo->data, player_header ) ;
+        player_names[i] = (char*)player_sarr.contents[row_number] ;
+    }
 }
 
 int _elo_get_number_of_data_rows( struct elo_calculator *elo ) {
