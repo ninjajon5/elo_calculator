@@ -158,13 +158,13 @@ int _8_test_elo_init_returns_starting_elos( void ) {
     elo_init( &test_elo ) ;
 
     elo_load_data( &test_elo, "test_named_players.csv" ) ;
-    elo_calculate( &test_elo, 1000.0f ) ;
+    elo_calculate( &test_elo, 1000.0f, 400.0f, 32.0f ) ;
 
     float name_A_elo = *(float*)dict_get( &test_elo.elos, "Name A" ) ;
 
     TASSERT(
-        name_A_elo >= 1000.0f,
-        "Expected Name A elo to exceed starting elo"
+        name_A_elo == 1016.0f,
+        "Expected Name A elo to be 1016"
     ) ;
 
     elo_free( &test_elo ) ;
