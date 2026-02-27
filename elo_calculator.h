@@ -15,6 +15,7 @@ struct elo_config {
 } ;
 
 struct elo_data_row {
+    int row_number ;
     char *player_names[2] ;
     char *winner ;
 } ;

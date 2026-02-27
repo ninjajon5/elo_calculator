@@ -49,11 +49,12 @@ struct elo_config _elo_config_init( float starting_elo, float diff_factor, float
 void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, int row_number ) {
     struct elo_data_row data_row ;
     _elo_get_row_data( elo, &data_row, row_number ) ;
-    _elo_add_player_names_to_elos( elo, config, data_row.player_names ) ;
     _elo_update_elos_from_data_row( elo, config, &data_row ) ;
 }
 
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row ) {    
+    _elo_add_player_names_to_elos( elo, config, row->player_names ) ;
+
     float p1_result = 0.0f ;
     float p2_result = 0.0f ;
 
@@ -80,6 +81,7 @@ void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_conf
 }
 
 void _elo_get_row_data( struct elo_calculator *elo, struct elo_data_row *data_row, int row_number ) {
+    data_row->row_number = row_number ;
     _elo_get_player_names_from_row( elo, data_row->player_names, row_number ) ;
     _elo_get_winner_from_row( elo, &data_row->winner, row_number ) ;
 }
