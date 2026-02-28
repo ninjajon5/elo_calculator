@@ -18,6 +18,10 @@ struct elo_data_row {
     int row_number ;
     char *player_names[2] ;
     char *winner ;
+    float player_results [2] ;
+    float player_elos[2] ;
+    float player_elo_changes[2] ;
+    float player_expected_results[2] ;
 } ;
 
 void elo_init( struct elo_calculator *elo ) ;

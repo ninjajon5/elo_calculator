@@ -14,8 +14,9 @@ void _elo_get_player_names_from_row( struct elo_calculator *elo, char *player_na
 void _elo_get_winner_from_row( struct elo_calculator *elo, char **winner, int row_number ) ;
 void _elo_add_player_names_to_elos( struct elo_calculator *elo, struct elo_config *config, char *player_names[2] ) ;
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row ) ;
-void _elo_assign_results( float *p1_result, float *p2_result, struct elo_data_row *row ) ;
-void _elo_assign_expected_results( float *p1_expected_result, float *p2_expected_result, float p1_elo, float p2_elo, struct elo_config *config ) ;
+void _elo_assign_results( struct elo_data_row *row ) ;
+void _elo_assign_expected_results( struct elo_config *config, struct elo_data_row *row ) ;
+void _elo_calculate_elo_change( struct elo_config *config, struct elo_data_row *row ) ;
 
 void elo_init( struct elo_calculator *elo ) {
     dict_init( &elo->data ) ;
@@ -56,39 +57,40 @@ void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, in
 
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row ) {    
     _elo_add_player_names_to_elos( elo, config, row->player_names ) ;
-
-    float p1_result ;
-    float p2_result ;
-    _elo_assign_results( &p1_result, &p2_result, row ) ;
-
+    
     float *p1_elo = (float*)dict_get( &elo->elos, row->player_names[0] ) ;
     float *p2_elo = (float*)dict_get( &elo->elos, row->player_names[1] ) ;
+    
+    row->player_elos[0] = *p1_elo ;
+    row->player_elos[1] = *p2_elo ;
 
-    float p1_expected_result ;
-    float p2_expected_result ;
-    _elo_assign_expected_results( &p1_expected_result, &p2_expected_result, *p1_elo, *p2_elo, config ) ;
+    _elo_assign_results( row ) ;
+    _elo_assign_expected_results( config, row ) ;
+    _elo_calculate_elo_change( config, row ) ;
 
-    float p1_elo_change = config->k * ( p1_result - p1_expected_result ) ;
-    float p2_elo_change = config->k * ( p2_result - p2_expected_result ) ;
-
-    *p1_elo += p1_elo_change ;
-    *p2_elo += p2_elo_change ;
+    *p1_elo += row->player_elo_changes[0] ;
+    *p2_elo += row->player_elo_changes[1] ;
 }
 
-void _elo_assign_results( float *p1_result, float *p2_result, struct elo_data_row *row ) {
+void _elo_assign_results( struct elo_data_row *row ) {
     if( strcmp( row->player_names[0], row->winner ) == 0 ) {
-        *p1_result += 1.0f ;
+        row->player_results[0] += 1.0f ;
     } else {
-        *p2_result += 1.0f ;
+        row->player_results[1] += 1.0f ;
     }
 }
 
-void _elo_assign_expected_results( float *p1_expected_result, float *p2_expected_result, float p1_elo, float p2_elo, struct elo_config *config ) {
-    float exponent = ( ( p2_elo - p1_elo ) / config->diff_factor ) ;
+void _elo_assign_expected_results( struct elo_config *config, struct elo_data_row *row ) {
+    float exponent = ( ( row->player_elos[1] - row->player_elos[0] ) / config->diff_factor ) ;
     float denominator = powf( 10.0f, exponent ) ;
 
-    *p1_expected_result = ( 1.0f / ( 1.0f + denominator ) ) ;
-    *p2_expected_result = 1.0f - *p1_expected_result ;
+    row->player_expected_results[0] = ( 1.0f / ( 1.0f + denominator ) ) ;
+    row->player_expected_results[1] = 1.0f - row->player_expected_results[0] ;
+}
+
+void _elo_calculate_elo_change( struct elo_config *config, struct elo_data_row *row ) {
+    row->player_elo_changes[0] = config->k * ( row->player_results[0] - row->player_expected_results[0] ) ;
+    row->player_elo_changes[1] = config->k * ( row->player_results[1] - row->player_expected_results[1] ) ;
 }
 
 void _elo_get_row_data( struct elo_calculator *elo, struct elo_data_row *data_row, int row_number ) {
