@@ -55,6 +55,12 @@ void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, in
     _elo_update_elos_from_data_row( elo, config, &data_row ) ;
 }
 
+void _elo_get_row_data( struct elo_calculator *elo, struct elo_data_row *data_row, int row_number ) {
+    data_row->row_number = row_number ;
+    _elo_get_player_names_from_row( elo, data_row->player_names, row_number ) ;
+    _elo_get_winner_from_row( elo, &data_row->winner, row_number ) ;
+}
+
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row ) {    
     _elo_add_player_names_to_elos( elo, config, row->player_names ) ;
     
@@ -91,12 +97,6 @@ void _elo_assign_expected_results( struct elo_config *config, struct elo_data_ro
 void _elo_calculate_elo_change( struct elo_config *config, struct elo_data_row *row ) {
     row->player_elo_changes[0] = config->k * ( row->player_results[0] - row->player_expected_results[0] ) ;
     row->player_elo_changes[1] = config->k * ( row->player_results[1] - row->player_expected_results[1] ) ;
-}
-
-void _elo_get_row_data( struct elo_calculator *elo, struct elo_data_row *data_row, int row_number ) {
-    data_row->row_number = row_number ;
-    _elo_get_player_names_from_row( elo, data_row->player_names, row_number ) ;
-    _elo_get_winner_from_row( elo, &data_row->winner, row_number ) ;
 }
 
 void _elo_get_player_names_from_row( struct elo_calculator *elo, char *player_names[2], int row_number ) {
