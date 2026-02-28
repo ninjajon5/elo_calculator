@@ -71,6 +71,8 @@ void _load_headers_into_keys( struct dict *data, struct sarr *line_data ) {
             header, empty_data,
             strlen( header ) + 1, sizeof( struct sarr )
         ) ;
+
+        free( empty_data ) ; // has been memcpy'd by sarr_append(), so can be freed
     }
 }
 
