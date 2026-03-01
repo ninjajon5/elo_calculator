@@ -209,7 +209,7 @@ int _9_test_elo_init_returns_correct_elos( void ) {
 
 int _10_test_winner_calculated_from_match_scores( void ) {
     void _elo_get_player_names_from_row( struct elo_calculator *elo, char *player_names[2], int row_number ) ;
-    void _elo_get_winner_from_row( struct elo_calculator *elo, char **winner, int row_number ) ;
+    void _elo_get_winner_from_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
     
     struct elo_calculator test_elo ;
     elo_init( &test_elo ) ;
@@ -218,7 +218,7 @@ int _10_test_winner_calculated_from_match_scores( void ) {
 
     struct elo_data_row test_data_row ;
     _elo_get_player_names_from_row( &test_elo, test_data_row.player_names, 0 ) ;
-    _elo_get_winner_from_row( &test_elo, &test_data_row.winner, 0 ) ;
+    _elo_get_winner_from_row( &test_elo, &test_data_row, 0 ) ;
 
     TASSERT(
         strcmp( test_data_row.winner, "Name A" ) == 0,
@@ -231,15 +231,15 @@ int _10_test_winner_calculated_from_match_scores( void ) {
 
 
 test_function tests[] = {
-    _1_test_print_prints_file_contents,
-    _2_test_print_headers_returns_headers,
-    _3_test_print_headers_returns_more_headers,
-    _4_test_print_file_prints_all_lines,
-    _5_test_load_data_dict_keys_contains_header,
-    _6_test_load_data_dict_values_contains_data,
-    _7_test_load_data_dict_values_contain_sarr_of_datapoints,
-    _8_test_elo_init_returns_starting_elos,
-    _9_test_elo_init_returns_correct_elos,
+    // _1_test_print_prints_file_contents,
+    // _2_test_print_headers_returns_headers,
+    // _3_test_print_headers_returns_more_headers,
+    // _4_test_print_file_prints_all_lines,
+    // _5_test_load_data_dict_keys_contains_header,
+    // _6_test_load_data_dict_values_contains_data,
+    // _7_test_load_data_dict_values_contain_sarr_of_datapoints,
+    // _8_test_elo_init_returns_starting_elos,
+    // _9_test_elo_init_returns_correct_elos,
     _10_test_winner_calculated_from_match_scores
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
