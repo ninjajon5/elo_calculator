@@ -105,7 +105,7 @@ void _elo_calculate_elo_change( struct elo_config *config, struct elo_data_row *
 }
 
 void _elo_get_player_names_from_row( struct elo_calculator *elo, char *player_names[2], int row_number ) {
-    char *player_headers[2] = { "p1", "p2" } ;
+    char *player_headers[2] = { "player1", "player2" } ;
 
     for( int i = 0 ; i < 2 ; i ++ ) {
         char *player_header = player_headers[i] ;
@@ -124,11 +124,45 @@ void _elo_get_winner_from_row( struct elo_calculator *elo, char **winner, int ro
 
 char* _elo_get_winner_from_winner_column( struct elo_calculator *elo, int row_number ) {
     struct sarr winner_sarr = *(struct sarr*)dict_get( &elo->data, "winner" ) ;
-    return (char*)winner_sarr.contents[row_number] ;
+    return (char*)winner_sarr.contents[ row_number ] ;
 }
 
 char* _elo_calculate_winner_from_match_results( struct elo_calculator *elo, int row_number ) {
-    return "test" ;
+    // this dict_get will return a sarr, the 'player1' column. we need to extract at the row_number 
+    struct sarr p1_sarr = *(struct sarr*)dict_get( &elo->data, "player1" ) ;
+    char *p1_name = (char*)p1_sarr.contents[ row_number ] ;
+    
+    struct sarr p2_sarr = *(struct sarr*)dict_get( &elo->data, "player2" ) ;
+    char *p2_name = (char*)p2_sarr.contents[ row_number ] ;
+    
+    int p1_match_count = 0 ;
+    int p2_match_count = 0 ;
+    
+    for( int i = 0 ; i < 7 ; i++ ) {
+        char p1_header[8] ;
+        snprintf( p1_header, sizeof( p1_header ), "G%dP1", i + 1 ) ;
+        struct sarr p1_score_sarr = *(struct sarr*)dict_get( &elo->data, p1_header ) ;
+        char *p1_score_str = (char*)p1_score_sarr.contents[ row_number ] ;
+        int p1_score = atoi( p1_score_str ) ;
+
+        char p2_header[8] ;
+        snprintf( p2_header, sizeof( p2_header ), "G%dP2", i + 1 ) ;
+        struct sarr p2_score_sarr = *(struct sarr*)dict_get( &elo->data, p2_header ) ;
+        char *p2_score_str = (char*)p2_score_sarr.contents[ row_number ] ;
+        int p2_score = atoi( p2_score_str ) ;
+
+        if( p1_score > p2_score ) {
+            p1_match_count += 1 ;
+        } else {
+            p2_match_count += 1 ;
+        }
+    }
+
+    if( p1_match_count > p2_match_count ) {
+        return p1_name ;
+    } else {
+        return p2_name ;
+    };
 }
 
 void _elo_add_player_names_to_elos( struct elo_calculator *elo, struct elo_config *config, char *player_names[2] ) {
