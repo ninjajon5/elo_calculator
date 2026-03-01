@@ -14,6 +14,7 @@ void _elo_get_player_names_from_row( struct elo_calculator *elo, char *player_na
 void _elo_get_winner_from_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
 char* _elo_get_winner_from_winner_column( struct elo_calculator *elo, int row_number ) ;
 char* _elo_calculate_winner_from_match_results( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
+void _elo_calculate_match_counts( struct elo_calculator *elo, int row_number, int *p1_match_count, int *p2_match_count ) ;
 int _elo_calculate_player_score( struct elo_calculator *elo, int row_number, int player_number, int game_number ) ;
 void _elo_add_player_names_to_elos( struct elo_calculator *elo, struct elo_config *config, char *player_names[2] ) ;
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row ) ;
@@ -131,17 +132,7 @@ char* _elo_get_winner_from_winner_column( struct elo_calculator *elo, int row_nu
 char* _elo_calculate_winner_from_match_results( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) { 
     int p1_match_count = 0 ;
     int p2_match_count = 0 ;
-    
-    for( int game_number = 0 ; game_number < 7 ; game_number++ ) {
-        int p1_score = _elo_calculate_player_score( elo, row_number, 1, game_number ) ;
-        int p2_score = _elo_calculate_player_score( elo, row_number, 2, game_number ) ;
-
-        if( p1_score > p2_score ) {
-            p1_match_count += 1 ;
-        } else {
-            p2_match_count += 1 ;
-        }
-    }
+    _elo_calculate_match_counts( elo, row_number, &p1_match_count, &p2_match_count ) ;
 
     if( p1_match_count > p2_match_count ) {
         return row->player_names[0] ;
@@ -156,6 +147,19 @@ int _elo_calculate_player_score( struct elo_calculator *elo, int row_number, int
     struct sarr p1_score_sarr = *(struct sarr*)dict_get( &elo->data, p1_header ) ;
     char *p1_score_str = (char*)p1_score_sarr.contents[ row_number ] ;
     return atoi( p1_score_str ) ;
+}
+
+void _elo_calculate_match_counts( struct elo_calculator *elo, int row_number, int *p1_match_count, int *p2_match_count ) {
+    for( int game_number = 0 ; game_number < 7 ; game_number++ ) {
+        int p1_score = _elo_calculate_player_score( elo, row_number, 1, game_number ) ;
+        int p2_score = _elo_calculate_player_score( elo, row_number, 2, game_number ) ;
+
+        if( p1_score > p2_score ) {
+            *p1_match_count += 1 ;
+        } else {
+            *p2_match_count += 1 ;
+        }
+    }
 }
 
 void _elo_add_player_names_to_elos( struct elo_calculator *elo, struct elo_config *config, char *player_names[2] ) {
