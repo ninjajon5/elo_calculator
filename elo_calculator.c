@@ -14,6 +14,7 @@ void _elo_get_player_names_from_row( struct elo_calculator *elo, char *player_na
 void _elo_get_winner_from_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
 char* _elo_get_winner_from_winner_column( struct elo_calculator *elo, int row_number ) ;
 char* _elo_calculate_winner_from_match_results( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
+int _elo_calculate_player_score( struct elo_calculator *elo, int row_number, int player_number, int game_number ) ;
 void _elo_add_player_names_to_elos( struct elo_calculator *elo, struct elo_config *config, char *player_names[2] ) ;
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row ) ;
 void _elo_assign_results( struct elo_data_row *row ) ;
@@ -131,18 +132,9 @@ char* _elo_calculate_winner_from_match_results( struct elo_calculator *elo, stru
     int p1_match_count = 0 ;
     int p2_match_count = 0 ;
     
-    for( int i = 0 ; i < 7 ; i++ ) {
-        char p1_header[8] ;
-        snprintf( p1_header, sizeof( p1_header ), "G%dP1", i + 1 ) ;
-        struct sarr p1_score_sarr = *(struct sarr*)dict_get( &elo->data, p1_header ) ;
-        char *p1_score_str = (char*)p1_score_sarr.contents[ row_number ] ;
-        int p1_score = atoi( p1_score_str ) ;
-
-        char p2_header[8] ;
-        snprintf( p2_header, sizeof( p2_header ), "G%dP2", i + 1 ) ;
-        struct sarr p2_score_sarr = *(struct sarr*)dict_get( &elo->data, p2_header ) ;
-        char *p2_score_str = (char*)p2_score_sarr.contents[ row_number ] ;
-        int p2_score = atoi( p2_score_str ) ;
+    for( int game_number = 0 ; game_number < 7 ; game_number++ ) {
+        int p1_score = _elo_calculate_player_score( elo, row_number, 1, game_number ) ;
+        int p2_score = _elo_calculate_player_score( elo, row_number, 2, game_number ) ;
 
         if( p1_score > p2_score ) {
             p1_match_count += 1 ;
@@ -156,6 +148,14 @@ char* _elo_calculate_winner_from_match_results( struct elo_calculator *elo, stru
     } else {
         return row->player_names[1] ;
     };
+}
+
+int _elo_calculate_player_score( struct elo_calculator *elo, int row_number, int player_number, int game_number ) {
+    char p1_header[8] ;
+    snprintf( p1_header, sizeof( p1_header ), "G%dP%d", game_number + 1, player_number ) ;
+    struct sarr p1_score_sarr = *(struct sarr*)dict_get( &elo->data, p1_header ) ;
+    char *p1_score_str = (char*)p1_score_sarr.contents[ row_number ] ;
+    return atoi( p1_score_str ) ;
 }
 
 void _elo_add_player_names_to_elos( struct elo_calculator *elo, struct elo_config *config, char *player_names[2] ) {
