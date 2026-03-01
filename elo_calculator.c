@@ -12,6 +12,8 @@ void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, in
 void _elo_get_row_data( struct elo_calculator *elo, struct elo_data_row *data_row, int row_number ) ;
 void _elo_get_player_names_from_row( struct elo_calculator *elo, char *player_names[2], int row_number ) ;
 void _elo_get_winner_from_row( struct elo_calculator *elo, char **winner, int row_number ) ;
+char* _elo_get_winner_from_winner_column( struct elo_calculator *elo, int row_number ) ;
+char* _elo_calculate_winner_from_match_results( struct elo_calculator *elo, int row_number ) ;
 void _elo_add_player_names_to_elos( struct elo_calculator *elo, struct elo_config *config, char *player_names[2] ) ;
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row ) ;
 void _elo_assign_results( struct elo_data_row *row ) ;
@@ -113,8 +115,20 @@ void _elo_get_player_names_from_row( struct elo_calculator *elo, char *player_na
 }
 
 void _elo_get_winner_from_row( struct elo_calculator *elo, char **winner, int row_number ) {
+    if( dict_has_key( &elo->data, "winner" ) ) {
+        *winner = _elo_get_winner_from_winner_column( elo, row_number ) ;
+    } else {
+        *winner = _elo_calculate_winner_from_match_results( elo, row_number ) ;
+    }
+}
+
+char* _elo_get_winner_from_winner_column( struct elo_calculator *elo, int row_number ) {
     struct sarr winner_sarr = *(struct sarr*)dict_get( &elo->data, "winner" ) ;
-    *winner = (char*)winner_sarr.contents[row_number] ;
+    return (char*)winner_sarr.contents[row_number] ;
+}
+
+char* _elo_calculate_winner_from_match_results( struct elo_calculator *elo, int row_number ) {
+    return "test" ;
 }
 
 void _elo_add_player_names_to_elos( struct elo_calculator *elo, struct elo_config *config, char *player_names[2] ) {
