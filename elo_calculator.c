@@ -79,6 +79,9 @@ void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_conf
 }
 
 void _elo_assign_results( struct elo_data_row *row ) {
+    row->player_results[0] = 0.0f ;
+    row->player_results[1] = 0.0f ;
+
     if( strcmp( row->player_names[0], row->winner ) == 0 ) {
         row->player_results[0] += 1.0f ;
     } else {
