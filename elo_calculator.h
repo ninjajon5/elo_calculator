@@ -2,6 +2,7 @@
 #define ELO_CALCULATOR_H
 
 #include "utils/dict.h"
+#include <stdbool.h>
 
 struct elo_calculator {
     struct dict data ;
@@ -20,7 +21,10 @@ struct elo_data_row {
     int row_number ;
     char *player_names[2] ;
     char *winner ;
-    float player_results [2] ;
+    bool straight_sets ;
+    bool player_within_boost_threshold[2] ;
+    int player_match_counts[2] ;
+    float player_results[2] ;
     float player_elos[2] ;
     float player_elo_changes[2] ;
     float player_expected_results[2] ;
