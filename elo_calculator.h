@@ -12,6 +12,8 @@ struct elo_config {
     float starting_elo ;
     float diff_factor ;
     float k ;
+    float boost_threshold ;
+    float k_scaling ;
 } ;
 
 struct elo_data_row {
@@ -26,7 +28,7 @@ struct elo_data_row {
 
 void elo_init( struct elo_calculator *elo ) ;
 void elo_load_data( struct elo_calculator *elo, char *path ) ;
-void elo_calculate_from_data( struct elo_calculator *elo, float starting_elo, float diff_factor, float k ) ;
+void elo_calculate_from_data( struct elo_calculator *elo, struct elo_config *config ) ;
 void elo_free( struct elo_calculator *elo ) ;
 
 #endif

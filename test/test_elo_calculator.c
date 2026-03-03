@@ -157,8 +157,14 @@ int _8_test_elo_init_returns_starting_elos( void ) {
     struct elo_calculator test_elo ;
     elo_init( &test_elo ) ;
 
+    struct elo_config test_config = {
+        .starting_elo = 1000.0f,
+        .diff_factor = 400.0f,
+        .k = 32.0f,
+    } ;
+
     elo_load_data( &test_elo, "test_named_players.csv" ) ;
-    elo_calculate_from_data( &test_elo, 1000.0f, 400.0f, 32.0f ) ;
+    elo_calculate_from_data( &test_elo, &test_config ) ;
 
     float name_A_elo = *(float*)dict_get( &test_elo.elos, "Name A" ) ;
 
@@ -175,8 +181,14 @@ int _9_test_elo_init_returns_correct_elos( void ) {
     struct elo_calculator test_elo ;
     elo_init( &test_elo ) ;
 
+    struct elo_config test_config = {
+        .starting_elo = 1000.0f,
+        .diff_factor = 400.0f,
+        .k = 32.0f,
+    } ;
+
     elo_load_data( &test_elo, "test_multiple_matches.csv" ) ;
-    elo_calculate_from_data( &test_elo, 1000.0f, 400.0f, 32.0f ) ;
+    elo_calculate_from_data( &test_elo, &test_config ) ;
 
     float name_A_elo = *(float*)dict_get( &test_elo.elos, "Name A" ) ;
     float name_B_elo = *(float*)dict_get( &test_elo.elos, "Name B" ) ;
@@ -233,8 +245,14 @@ int _11_multiple_matches_with_all_headers_returns_correct_elos( void ) {
     struct elo_calculator test_elo ;
     elo_init( &test_elo ) ;
 
+    struct elo_config test_config = {
+        .starting_elo = 1000.0f,
+        .diff_factor = 400.0f,
+        .k = 32.0f,
+    } ;
+
     elo_load_data( &test_elo, "all_headers_three_rows.csv" ) ;
-    elo_calculate_from_data( &test_elo, 1000.0f, 400.0f, 32.0f ) ;
+    elo_calculate_from_data( &test_elo, &test_config ) ;
 
     float name_A_elo = *(float*)dict_get( &test_elo.elos, "Name A" ) ;
     float name_B_elo = *(float*)dict_get( &test_elo.elos, "Name B" ) ;

@@ -7,7 +7,6 @@
 #include "utils/IO.h"
 
 int _elo_get_number_of_data_rows( struct elo_calculator *elo ) ;
-struct elo_config _elo_config_init( float starting_elo, float diff_factor, float k ) ;
 void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, int row_number ) ;
 void _elo_get_row_data( struct elo_calculator *elo, struct elo_data_row *data_row, int row_number ) ;
 void _elo_get_player_names_from_row( struct elo_calculator *elo, char *player_names[2], int row_number ) ;
@@ -31,26 +30,16 @@ void elo_load_data( struct elo_calculator *elo, char *path ) {
     elo->data = load_data( path ) ;
 }
 
-void elo_calculate_from_data( struct elo_calculator *elo, float starting_elo, float diff_factor, float k ) {
-    struct elo_config config = _elo_config_init( starting_elo, diff_factor, k ) ;
+void elo_calculate_from_data( struct elo_calculator *elo, struct elo_config *config ) {
     int number_of_data_rows = _elo_get_number_of_data_rows( elo ) ;
     for( int i = 0 ; i < number_of_data_rows ; i++ ) {
-        _elo_update_elos( elo, &config, i ) ;
+        _elo_update_elos( elo, config, i ) ;
     }
 }
 
 void elo_free( struct elo_calculator *elo ) {
     dict_free_with_nested_sarrs( &elo->data ) ;
     dict_free( &elo->elos ) ;
-}
-
-struct elo_config _elo_config_init( float starting_elo, float diff_factor, float k ) {
-    struct elo_config config = {
-        .starting_elo = starting_elo,
-        .diff_factor = diff_factor,
-        .k = k
-    } ;
-    return config ;
 }
 
 void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, int row_number ) {
