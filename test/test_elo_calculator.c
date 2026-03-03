@@ -229,6 +229,42 @@ int _10_test_winner_calculated_from_match_scores( void ) {
     return 1 ;
 }
 
+int _11_multiple_matches_with_all_headers_returns_correct_elos( void ) {
+    struct elo_calculator test_elo ;
+    elo_init( &test_elo ) ;
+
+    elo_load_data( &test_elo, "all_headers_three_rows.csv" ) ;
+    elo_calculate_from_data( &test_elo, 1000.0f, 400.0f, 32.0f ) ;
+
+    float name_A_elo = *(float*)dict_get( &test_elo.elos, "Name A" ) ;
+    float name_B_elo = *(float*)dict_get( &test_elo.elos, "Name B" ) ;
+    float name_C_elo = *(float*)dict_get( &test_elo.elos, "Name C" ) ;
+    float name_D_elo = *(float*)dict_get( &test_elo.elos, "Name D" ) ;
+
+    TASSERT(
+        roundf( name_A_elo ) == 1031.0f, 
+        "Expected Name A elo to round to 1031"
+    ) ;
+
+    TASSERT(
+        roundf( name_B_elo ) == 984.0f,
+        "Expected Name B elo to round to 984"
+    ) ;
+
+    TASSERT(
+        roundf( name_C_elo ) == 969.0f,
+        "Expected Name C elo to round to 969"
+    ) ;
+
+    TASSERT(
+        roundf( name_D_elo ) == 1016.0f,
+        "Expected Name D elo to round to 1016"
+    ) ;
+
+    elo_free( &test_elo ) ;
+    return 1 ;
+}
+
 
 test_function tests[] = {
     _1_test_print_prints_file_contents,
@@ -240,7 +276,8 @@ test_function tests[] = {
     _7_test_load_data_dict_values_contain_sarr_of_datapoints,
     _8_test_elo_init_returns_starting_elos,
     _9_test_elo_init_returns_correct_elos,
-    _10_test_winner_calculated_from_match_scores
+    _10_test_winner_calculated_from_match_scores,
+    _11_multiple_matches_with_all_headers_returns_correct_elos
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
