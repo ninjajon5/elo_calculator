@@ -102,6 +102,7 @@ void _elo_assign_expected_results( struct elo_config *config, struct elo_data_ro
 }
 
 void _elo_calculate_elo_change( struct elo_config *config, struct elo_data_row *row ) {
+    // scale k by k_scaling if boosted by game count or straight sets
     row->player_elo_changes[0] = config->k * ( row->player_results[0] - row->player_expected_results[0] ) ;
     row->player_elo_changes[1] = config->k * ( row->player_results[1] - row->player_expected_results[1] ) ;
 }
