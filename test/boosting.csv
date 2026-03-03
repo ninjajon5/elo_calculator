@@ -1,0 +1,6 @@
+﻿match_ID,date,season,round,player1,player2,G1P1,G1P2,G2P1,G2P2,G3P1,G3P2,G4P1,G4P2,G5P1,G5P2,G6P1,G6P2,G7P1,G7P2,test_rationale
+1,01/01/2026,1,1,Name A,Name B,11,0,11,0,,,,,,,,,,,straight sets and within boost threshold - 2 sets
+2,01/01/2026,1,1,Name C,Name D,0,11,0,11,0,11,0,11,,,,,,,straight sets and within boost threshold - 4 sets
+3,01/01/2026,1,1,Name E,Name F,11,0,0,11,11,0,,,,,,,,,not straight sets and within boost threshold
+4,01/01/2026,1,1,Name A,Name G,11,0,0,11,11,0,,,,,,,,,not straight sets - within boost for one player but not the other
+5,01/01/2026,1,1,Name A,Name G,0,11,0,11,,,,,,,,,,,straight sets without boost
