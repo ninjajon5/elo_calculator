@@ -247,7 +247,7 @@ int _10_test_winner_calculated_from_match_scores( void ) {
     return 1 ;
 }
 
-int _11_multiple_matches_with_all_headers_returns_correct_elos( void ) {
+int _11_test_multiple_matches_with_all_headers_returns_correct_elos( void ) {
     struct elo_calculator test_elo ;
     elo_init( &test_elo ) ;
 
@@ -290,7 +290,7 @@ int _11_multiple_matches_with_all_headers_returns_correct_elos( void ) {
     return 1 ;
 }
 
-int _12_straight_set_matches_return_boosted_elos( void ) {
+int _12_test_straight_set_matches_return_boosted_elos( void ) {
     struct elo_calculator test_elo ;
     elo_init( &test_elo ) ;
 
@@ -322,7 +322,7 @@ int _12_straight_set_matches_return_boosted_elos( void ) {
     return 1 ;
 }
 
-int _13_all_boost_combinations_return_correct_elos( void ) {
+int _13_test_all_boost_combinations_return_correct_elos( void ) {
     struct elo_calculator test_elo ;
     elo_init( &test_elo ) ;
 
@@ -384,6 +384,34 @@ int _13_all_boost_combinations_return_correct_elos( void ) {
     return 1 ;
 }
 
+int _14_test_write_data_writes_basic_csv( void ) {
+    struct dict data = load_data( "test_two_data_rows.csv" ) ;
+
+    char *test_file_path = "test_write_data.csv" ;
+
+    write_data( &data, test_file_path ) ;
+
+    FILE *test_file = fopen( test_file_path, "r" ) ;
+    char line_1[ 16 ] ;
+    char line_2[ 16 ] ;
+    fgets( line_1, sizeof( line_1 ), test_file ) ;
+    fgets( line_2, sizeof( line_2 ), test_file ) ;
+
+    TASSERT(
+        strcmp( line_1, "p1,p2\n" ) == 0,
+        "Expected line 1 to contain 'p1,p2'"
+    ) ;
+
+    TASSERT(
+        strcmp( line_1, "w,l" ) == 0,
+        "Expected line 1 to contain 'w,l'"
+    ) ;
+
+
+    dict_free_with_nested_sarrs( &data ) ;
+    return 1 ;
+}
+
 
 test_function tests[] = {
     _1_test_print_prints_file_contents,
@@ -396,9 +424,9 @@ test_function tests[] = {
     _8_test_elo_init_returns_starting_elos,
     _9_test_elo_init_returns_correct_elos,
     _10_test_winner_calculated_from_match_scores,
-    _11_multiple_matches_with_all_headers_returns_correct_elos,
-    _12_straight_set_matches_return_boosted_elos,
-    _13_all_boost_combinations_return_correct_elos
+    _11_test_multiple_matches_with_all_headers_returns_correct_elos,
+    _12_test_straight_set_matches_return_boosted_elos,
+    _13_test_all_boost_combinations_return_correct_elos
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
