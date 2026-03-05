@@ -6,5 +6,6 @@
 void print_data( char *path ) ;
 void print_headers( char *path ) ;
 struct dict load_data( char *path ) ;
+void write_data( struct dict *data, char *path ) ;
 
 #endif

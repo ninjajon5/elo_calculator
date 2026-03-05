@@ -394,19 +394,25 @@ int _14_test_write_data_writes_basic_csv( void ) {
     FILE *test_file = fopen( test_file_path, "r" ) ;
     char line_1[ 16 ] ;
     char line_2[ 16 ] ;
+    char line_3[ 16 ] ;
     fgets( line_1, sizeof( line_1 ), test_file ) ;
     fgets( line_2, sizeof( line_2 ), test_file ) ;
+    fgets( line_3, sizeof( line_3 ), test_file ) ;
 
     TASSERT(
-        strcmp( line_1, "p1,p2\n" ) == 0,
-        "Expected line 1 to contain 'p1,p2'"
+        strcmp( line_1, "p1,player2,result\n" ) == 0,
+        "Expected line 1 to contain 'p1,player2,result'"
     ) ;
 
     TASSERT(
-        strcmp( line_1, "w,l" ) == 0,
-        "Expected line 1 to contain 'w,l'"
+        strcmp( line_2, "11,5,p1\n" ) == 0,
+        "Expected line 2 to contain '11,5,p1'"
     ) ;
 
+    TASSERT(
+        strcmp( line_3, "5,11,p2" ) == 0,
+        "Expected line 3 to contain '5,11,p2'"
+    ) ;
 
     dict_free_with_nested_sarrs( &data ) ;
     return 1 ;
@@ -426,7 +432,8 @@ test_function tests[] = {
     _10_test_winner_calculated_from_match_scores,
     _11_test_multiple_matches_with_all_headers_returns_correct_elos,
     _12_test_straight_set_matches_return_boosted_elos,
-    _13_test_all_boost_combinations_return_correct_elos
+    _13_test_all_boost_combinations_return_correct_elos,
+    _14_test_write_data_writes_basic_csv
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 

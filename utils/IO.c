@@ -42,6 +42,21 @@ struct dict load_data( char *path ) {
     return data ;
 }
 
+void write_data( struct dict *data, char *path ) {
+    if( data->values.len != data->keys.len ) {
+        printf( "write_data: data values len != data keys len" ) ;
+        exit( 1 ) ;
+    }
+
+    for( int i = 0 ; i < data->keys.len ; i++ ) {
+        if( i == 0 ) {
+            // print headers
+        } else {
+            // print values
+        }
+    }
+}
+
 void _load_data_lines( struct dict *data, FILE *data_file ) {
     int linecount = 0 ;
     char line[ 256 ] ;
