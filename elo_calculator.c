@@ -9,9 +9,9 @@
 int _elo_get_number_of_data_rows( struct elo_calculator *elo ) ;
 struct elo_config elo_config_default( void ) ;
 void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, int row_number ) ;
-void _elo_get_row_data( struct elo_calculator *elo, struct elo_data_row *data_row, int row_number ) ;
-void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
-bool _elo_check_if_within_boost_threshold( char *player_name, struct sarr *player_sarr ) ;
+void _elo_get_row_data( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *data_row, int row_number ) ;
+void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row, int row_number ) ;
+bool _elo_check_if_within_boost_threshold( struct elo_config *config, char *player_name, struct sarr *player_sarr, int row_number ) ;
 void _elo_add_winner_and_straight_sets_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
 char* _elo_get_winner_from_winner_column( struct elo_calculator *elo, int row_number ) ;
 char* _elo_get_winner_from_match_counts( struct elo_data_row *row ) ;
@@ -25,8 +25,6 @@ void _elo_assign_expected_results( struct elo_config *config, struct elo_data_ro
 void _elo_calculate_elo_change( struct elo_config *config, struct elo_data_row *row ) ;
 float _elo_calculate_k( struct elo_config *config, struct elo_data_row *row ) ;
 float _elo_update_k_values( float *k, struct elo_config *config, struct elo_data_row *row ) ;
-bool _elo_match_won_in_straight_sets( struct elo_data_row *row ) ;
-bool _elo_match_within_boost_threshold( struct elo_data_row *row ) ;
 
 void elo_init( struct elo_calculator *elo ) {
     dict_init( &elo->data ) ;
@@ -56,13 +54,13 @@ void elo_free( struct elo_calculator *elo ) {
 
 void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, int row_number ) {
     struct elo_data_row data_row ;
-    _elo_get_row_data( elo, &data_row, row_number ) ;
+    _elo_get_row_data( elo, config, &data_row, row_number ) ;
     _elo_update_elos_from_data_row( elo, config, &data_row ) ;
 }
 
-void _elo_get_row_data( struct elo_calculator *elo, struct elo_data_row *data_row, int row_number ) {
+void _elo_get_row_data( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *data_row, int row_number ) {
     data_row->row_number = row_number ;
-    _elo_add_player_names_and_within_boost_threshold_to_row( elo, data_row, row_number ) ;
+    _elo_add_player_names_and_within_boost_threshold_to_row( elo, config, data_row, row_number ) ;
     _elo_add_winner_and_straight_sets_to_row( elo, data_row, row_number ) ;
 }
 
@@ -111,38 +109,51 @@ void _elo_calculate_elo_change( struct elo_config *config, struct elo_data_row *
 
 float _elo_update_k_values( float *k, struct elo_config *config, struct elo_data_row *row ) {
     for( int i = 0 ; i < 2 ; i++ ) {
-        if( _elo_match_won_in_straight_sets( row ) ) {
+        if( row->straight_sets ) {
             k[i] *= config->k_scaling ;
         }
-        if( _elo_match_within_boost_threshold( row ) ) {
+        if( row->player_within_boost_threshold[i] ) {
             k[i] *= config->k_scaling ;
         }
     }
 }
 
-bool _elo_match_won_in_straight_sets( struct elo_data_row *row ) {
-    return false ;
-}
-
-bool _elo_match_within_boost_threshold( struct elo_data_row *row ) {
-    return false ;
-}
-
-void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) {
+void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row, int row_number ) {
     char *player_headers[2] = { "player1", "player2" } ;
+    char *player_names[2] ;
+    struct sarr player_sarrs[2] ;
 
-    for( int i = 0 ; i < 2 ; i ++ ) {
+    for( int i = 0 ; i < 2 ; i++ ) {
         char *player_header = player_headers[i] ;
-        struct sarr player_sarr = *(struct sarr*)dict_get( &elo->data, player_header ) ;
-        char *player_name = (char*)player_sarr.contents[ row_number ] ;
+        player_sarrs[i] = *(struct sarr*)dict_get( &elo->data, player_headers[i] ) ;
+        player_names[i] = (char*)player_sarrs[i].contents[ row_number ] ;
+        row->player_names[i] = player_names[i] ;
+    }
 
-        row->player_names[i] = player_name ;
-        row->player_within_boost_threshold[i] = _elo_check_if_within_boost_threshold( player_name, &player_sarr ) ;
+    for( int i = 0 ; i < 2 ; i++ ) {
+        row->player_within_boost_threshold[i] = _elo_check_if_within_boost_threshold( config, player_names[i], player_sarrs, row_number ) ;
     }
 }
 
-bool _elo_check_if_within_boost_threshold( char *player_name, struct sarr *player_sarr ) {
+bool _elo_check_if_within_boost_threshold( struct elo_config *config, char *player_name, struct sarr *player_sarrs, int row_number ) {
+    int player_match_count = 0 ;
+
+    for( int i = 0 ; i <= row_number ; i++ ) {
+        char *player1_name = player_sarrs[0].contents[i] ;
+        char *player2_name = player_sarrs[1].contents[i] ;
+        if( 
+            strcmp( player_name, player1_name ) == 0 ||
+            strcmp( player_name, player2_name ) == 0
+        ) {
+            player_match_count += 1 ;
+        }
+    }
+
+    if( player_match_count > config->boost_threshold ) {
+        return false ;
+    } else {
     return true ;
+    }
 }
 
 void _elo_add_winner_and_straight_sets_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) {
@@ -150,7 +161,7 @@ void _elo_add_winner_and_straight_sets_to_row( struct elo_calculator *elo, struc
         row->winner = _elo_get_winner_from_winner_column( elo, row_number ) ;
         row->straight_sets = false ;
     } else {
-        _elo_calculate_match_counts( elo, row_number, &row->player_match_counts[0], &row->player_match_counts[1] ) ;
+        _elo_calculate_match_counts( elo, row_number, &row->player_set_counts[0], &row->player_set_counts[1] ) ;
         row->winner = _elo_get_winner_from_match_counts( row ) ;
         row->straight_sets = _elo_get_straight_sets_from_match_counts( row ) ;
     }
@@ -162,7 +173,7 @@ char* _elo_get_winner_from_winner_column( struct elo_calculator *elo, int row_nu
 }
 
 char* _elo_get_winner_from_match_counts( struct elo_data_row *row ) { 
-    if( row->player_match_counts[0] > row->player_match_counts[1] ) {
+    if( row->player_set_counts[0] > row->player_set_counts[1] ) {
         return row->player_names[0] ;
     } else {
         return row->player_names[1] ;
@@ -170,7 +181,7 @@ char* _elo_get_winner_from_match_counts( struct elo_data_row *row ) {
 }
 
 bool _elo_get_straight_sets_from_match_counts( struct elo_data_row *row ) {
-    if( row->player_match_counts[0] == 0 || row->player_match_counts[1] == 0 ) {
+    if( row->player_set_counts[0] == 0 || row->player_set_counts[1] == 0 ) {
         return true ;
     } else {
         return false ;
@@ -180,14 +191,14 @@ bool _elo_get_straight_sets_from_match_counts( struct elo_data_row *row ) {
 void _elo_calculate_match_counts( struct elo_calculator *elo, int row_number, int *p1_match_count, int *p2_match_count ) {
     *p1_match_count = 0 ;
     *p2_match_count = 0 ;
-    
+
     for( int game_number = 0 ; game_number < 7 ; game_number++ ) {
         int p1_score = _elo_calculate_player_score( elo, row_number, 1, game_number ) ;
         int p2_score = _elo_calculate_player_score( elo, row_number, 2, game_number ) ;
 
         if( p1_score > p2_score ) {
             *p1_match_count += 1 ;
-        } else {
+        } else if ( p2_score > p1_score ) {
             *p2_match_count += 1 ;
         }
     }

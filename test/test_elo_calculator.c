@@ -161,7 +161,7 @@ int _8_test_elo_init_returns_starting_elos( void ) {
         .starting_elo = 1000.0f,
         .diff_factor = 400.0f,
         .k = 32.0f,
-        .k_scaling = 0.0f
+        .k_scaling = 1.0f
     } ;
 
     elo_load_data( &test_elo, "test_named_players.csv" ) ;
@@ -186,7 +186,7 @@ int _9_test_elo_init_returns_correct_elos( void ) {
         .starting_elo = 1000.0f,
         .diff_factor = 400.0f,
         .k = 32.0f,
-        .k_scaling = 0.0f
+        .k_scaling = 1.0f
     } ;
 
     elo_load_data( &test_elo, "test_multiple_matches.csv" ) ;
@@ -222,16 +222,20 @@ int _9_test_elo_init_returns_correct_elos( void ) {
 }
 
 int _10_test_winner_calculated_from_match_scores( void ) {
-    void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
+    void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row, int row_number ) ;
     void _elo_add_winner_and_straight_sets_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
     
     struct elo_calculator test_elo ;
     elo_init( &test_elo ) ;
 
+    struct elo_config test_config = {
+        .boost_threshold = 0.0f
+    } ;
+
     elo_load_data( &test_elo, "all_headers_one_row.csv" ) ;
 
     struct elo_data_row test_data_row ;
-    _elo_add_player_names_and_within_boost_threshold_to_row( &test_elo, &test_data_row, 0 ) ;
+    _elo_add_player_names_and_within_boost_threshold_to_row( &test_elo, &test_config, &test_data_row, 0 ) ;
     _elo_add_winner_and_straight_sets_to_row( &test_elo, &test_data_row, 0 ) ;
 
     TASSERT(
@@ -251,7 +255,7 @@ int _11_multiple_matches_with_all_headers_returns_correct_elos( void ) {
         .starting_elo = 1000.0f,
         .diff_factor = 400.0f,
         .k = 32.0f,
-        .k_scaling = 0.0f
+        .k_scaling = 1.0f
     } ;
 
     elo_load_data( &test_elo, "all_headers_three_rows.csv" ) ;
@@ -294,7 +298,7 @@ int _12_straight_set_matches_return_boosted_elos( void ) {
         .starting_elo = 1000.0f,
         .diff_factor = 400.0f,
         .k = 32.0f,
-        .boost_threshold = 1.0f,
+        .boost_threshold = 0.0f,
         .k_scaling = 1.25f
     } ;
 

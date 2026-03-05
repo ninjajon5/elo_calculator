@@ -23,7 +23,7 @@ struct elo_data_row {
     char *winner ;
     bool straight_sets ;
     bool player_within_boost_threshold[2] ;
-    int player_match_counts[2] ;
+    int player_set_counts[2] ;
     float player_results[2] ;
     float player_elos[2] ;
     float player_elo_changes[2] ;
