@@ -12,6 +12,7 @@ void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, in
 void _elo_get_row_data( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *data_row, int row_number ) ;
 void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row, int row_number ) ;
 void _elo_add_player_names_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number, char *player_headers[2], char *player_names[2], struct sarr player_sarrs[2] ) ;
+void _elo_add_within_boost_threshold_to_row( struct elo_config *config, struct elo_data_row *row, char *player_names[2], struct sarr player_sarrs[2], int row_number ) ;
 bool _elo_check_if_within_boost_threshold( struct elo_config *config, char *player_name, struct sarr *player_sarr, int row_number ) ;
 void _elo_add_winner_and_straight_sets_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number ) ;
 char* _elo_get_winner_from_winner_column( struct elo_calculator *elo, int row_number ) ;
@@ -125,10 +126,7 @@ void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calcula
     struct sarr player_sarrs[2] ;
 
     _elo_add_player_names_to_row( elo, row, row_number, player_headers, player_names, player_sarrs ) ;
-
-    for( int i = 0 ; i < 2 ; i++ ) {
-        row->player_within_boost_threshold[i] = _elo_check_if_within_boost_threshold( config, player_names[i], player_sarrs, row_number ) ;
-    }
+    _elo_add_within_boost_threshold_to_row( config, row, player_names, player_sarrs, row_number ) ;
 }
 
 void _elo_add_player_names_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number, char *player_headers[2], char *player_names[2], struct sarr player_sarrs[2] ) {
@@ -137,6 +135,12 @@ void _elo_add_player_names_to_row( struct elo_calculator *elo, struct elo_data_r
         player_sarrs[i] = *(struct sarr*)dict_get( &elo->data, player_headers[i] ) ;
         player_names[i] = (char*)player_sarrs[i].contents[ row_number ] ;
         row->player_names[i] = player_names[i] ;
+    }
+}
+
+void _elo_add_within_boost_threshold_to_row( struct elo_config *config, struct elo_data_row *row, char *player_names[2], struct sarr player_sarrs[2], int row_number ) {
+    for( int i = 0 ; i < 2 ; i++ ) {
+        row->player_within_boost_threshold[i] = _elo_check_if_within_boost_threshold( config, player_names[i], player_sarrs, row_number ) ;
     }
 }
 
