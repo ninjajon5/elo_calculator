@@ -322,6 +322,68 @@ int _12_straight_set_matches_return_boosted_elos( void ) {
     return 1 ;
 }
 
+int _13_all_boost_combinations_return_correct_elos( void ) {
+    struct elo_calculator test_elo ;
+    elo_init( &test_elo ) ;
+
+    struct elo_config test_config = {
+        .starting_elo = 1000.0f,
+        .diff_factor = 400.0f,
+        .k = 32.0f,
+        .boost_threshold = 1.0f,
+        .k_scaling = 1.25f
+    } ;
+
+    elo_load_data( &test_elo, "boosting.csv" ) ;
+    elo_calculate_from_data( &test_elo, &test_config ) ;
+
+    float name_A_elo = *(float*)dict_get( &test_elo.elos, "Name A" ) ;
+    float name_B_elo = *(float*)dict_get( &test_elo.elos, "Name B" ) ;
+    float name_C_elo = *(float*)dict_get( &test_elo.elos, "Name C" ) ;
+    float name_D_elo = *(float*)dict_get( &test_elo.elos, "Name D" ) ;
+    float name_E_elo = *(float*)dict_get( &test_elo.elos, "Name E" ) ;
+    float name_F_elo = *(float*)dict_get( &test_elo.elos, "Name F" ) ;
+    float name_G_elo = *(float*)dict_get( &test_elo.elos, "Name G" ) ;
+
+    TASSERT(
+        roundf( name_A_elo ) == 1017.0f,
+        "Expected Name A elo to round to 1017"
+    ) ;
+
+    TASSERT(
+        roundf( name_B_elo ) == 975.0f,
+        "Expected Name B elo to round to 975"
+    ) ;
+
+    TASSERT(
+        roundf( name_C_elo ) == 975.0f,
+        "Expected Name C elo to round to 975"
+    ) ;
+
+    TASSERT(
+        roundf( name_D_elo ) == 1025.0f,
+        "Expected Name D elo to round to 1025"
+    ) ;
+
+        TASSERT(
+        roundf( name_E_elo ) == 1020.0f,
+        "Expected Name E elo to round to 1020"
+    ) ;
+
+    TASSERT(
+        roundf( name_F_elo ) == 980.0f,
+        "Expected Name F elo to round to 980"
+    ) ;
+
+    TASSERT(
+        roundf( name_G_elo ) == 1005.0f,
+        "Expected Name G elo to round to 1005"
+    ) ;
+
+    elo_free( &test_elo ) ;
+    return 1 ;
+}
+
 
 test_function tests[] = {
     _1_test_print_prints_file_contents,
@@ -335,7 +397,8 @@ test_function tests[] = {
     _9_test_elo_init_returns_correct_elos,
     _10_test_winner_calculated_from_match_scores,
     _11_multiple_matches_with_all_headers_returns_correct_elos,
-    _12_straight_set_matches_return_boosted_elos
+    _12_straight_set_matches_return_boosted_elos,
+    _13_all_boost_combinations_return_correct_elos
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
