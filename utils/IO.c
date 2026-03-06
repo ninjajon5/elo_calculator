@@ -4,6 +4,7 @@
 #include "sarr.h"
 #include "dict.h"
 
+void _write_headers( struct dict *data, FILE *file ) ;
 void _write_data_point( struct dict *data, FILE *file, char *data_point, int column_number ) ;
 void _load_data_lines( struct dict *data, FILE *data_file ) ;
 void _load_data_line( struct dict *data, char *line, int *linecount ) ;
@@ -59,10 +60,7 @@ void write_data( struct dict *data, char *path ) {
     int number_of_rows = get_number_of_data_rows( data ) ;
     for( int row_number = 0 ; row_number <= number_of_rows ; row_number++ ) {
         if( row_number == 0 ) {
-            for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
-                char *value = data->keys.contents[ column_number ] ;
-                _write_data_point( data, file, value, column_number ) ;
-            }
+            _write_headers( data, file ) ;
         } else {
             for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
                 struct sarr *column = data->values.contents[ column_number ] ;
@@ -88,6 +86,13 @@ int get_number_of_data_rows( struct dict *data ) {
     }
 
     return rows_in_column_1 ;
+}
+
+void _write_headers( struct dict *data, FILE *file ) {
+    for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
+        char *value = data->keys.contents[ column_number ] ;
+        _write_data_point( data, file, value, column_number ) ;
+    }
 }
 
 void _write_data_point( struct dict *data, FILE *file, char *data_point, int column_number ) {
