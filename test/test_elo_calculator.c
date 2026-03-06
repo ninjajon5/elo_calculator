@@ -392,9 +392,9 @@ int _14_test_write_data_writes_basic_csv( void ) {
     write_data( &data, test_file_path ) ;
 
     FILE *test_file = fopen( test_file_path, "r" ) ;
-    char line_1[ 16 ] ;
-    char line_2[ 16 ] ;
-    char line_3[ 16 ] ;
+    char line_1[ 32 ] ;
+    char line_2[ 32 ] ;
+    char line_3[ 32 ] ;
     fgets( line_1, sizeof( line_1 ), test_file ) ;
     fgets( line_2, sizeof( line_2 ), test_file ) ;
     fgets( line_3, sizeof( line_3 ), test_file ) ;
@@ -410,7 +410,7 @@ int _14_test_write_data_writes_basic_csv( void ) {
     ) ;
 
     TASSERT(
-        strcmp( line_3, "5,11,p2" ) == 0,
+        strcmp( line_3, "5,11,p2\n" ) == 0,
         "Expected line 3 to contain '5,11,p2'"
     ) ;
 

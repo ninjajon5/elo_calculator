@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "IO.h"
 #include "sarr.h"
 #include "dict.h"
 
@@ -48,13 +49,55 @@ void write_data( struct dict *data, char *path ) {
         exit( 1 ) ;
     }
 
-    for( int i = 0 ; i < data->keys.len ; i++ ) {
-        if( i == 0 ) {
+    FILE *file = fopen( path, "w" ) ;
+    if( file == NULL ) {
+        fprintf( stderr, "IO: failed to write file" ) ;
+        exit( 1 ) ;
+    }
+
+    int number_of_rows = get_number_of_data_rows( data ) ;
+    for( int row_number = 0 ; row_number <= number_of_rows ; row_number++ ) {
+        if( row_number == 0 ) {
             // print headers
+            for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
+                fputs( (char*)data->keys.contents[ column_number ], file ) ;
+                if( column_number == ( data->keys.len - 1 ) ) {
+                    fputs( "\n", file ) ; // final value only gets newline instead of comma
+                } else {
+                    fputs( ",", file ) ;
+                }
+            }
         } else {
             // print values
+            for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
+                struct sarr *column = data->values.contents[ column_number ] ;
+                char *value = column->contents[ row_number - 1 ] ; // subtract 1 to adjust for header row
+                fputs( value, file ) ;
+                if( column_number == ( data->keys.len - 1 ) ) {
+                    fputs( "\n", file ) ; // final value only gets newline instead of comma
+                } else {
+                    fputs( ",", file ) ;
+                }
+            }
         }
     }
+
+    fclose( file ) ;
+}
+
+int get_number_of_data_rows( struct dict *data ) {
+    struct sarr column_1 = *(struct sarr*)data->values.contents[0] ;
+    struct sarr column_2 = *(struct sarr*)data->values.contents[1] ;
+
+    int rows_in_column_1 = column_1.len ;
+    int rows_in_column_2 = column_2.len ;
+
+    if ( rows_in_column_1 != rows_in_column_2 ) {
+        fprintf(stderr, "IO: data dict columns have different row counts\n") ;
+        exit( 1 ) ;
+    }
+
+    return rows_in_column_1 ;
 }
 
 void _load_data_lines( struct dict *data, FILE *data_file ) {
