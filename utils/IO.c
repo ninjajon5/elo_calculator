@@ -4,6 +4,7 @@
 #include "sarr.h"
 #include "dict.h"
 
+void _write_data_point( struct dict *data, FILE *file, char *data_point, int column_number ) ;
 void _load_data_lines( struct dict *data, FILE *data_file ) ;
 void _load_data_line( struct dict *data, char *line, int *linecount ) ;
 void _load_headers_into_keys( struct dict *data, struct sarr *line_data ) ;
@@ -58,26 +59,15 @@ void write_data( struct dict *data, char *path ) {
     int number_of_rows = get_number_of_data_rows( data ) ;
     for( int row_number = 0 ; row_number <= number_of_rows ; row_number++ ) {
         if( row_number == 0 ) {
-            // print headers
             for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
-                fputs( (char*)data->keys.contents[ column_number ], file ) ;
-                if( column_number == ( data->keys.len - 1 ) ) {
-                    fputs( "\n", file ) ; // final value only gets newline instead of comma
-                } else {
-                    fputs( ",", file ) ;
-                }
+                char *value = data->keys.contents[ column_number ] ;
+                _write_data_point( data, file, value, column_number ) ;
             }
         } else {
-            // print values
             for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
                 struct sarr *column = data->values.contents[ column_number ] ;
                 char *value = column->contents[ row_number - 1 ] ; // subtract 1 to adjust for header row
-                fputs( value, file ) ;
-                if( column_number == ( data->keys.len - 1 ) ) {
-                    fputs( "\n", file ) ; // final value only gets newline instead of comma
-                } else {
-                    fputs( ",", file ) ;
-                }
+                _write_data_point( data, file, value, column_number ) ;
             }
         }
     }
@@ -98,6 +88,15 @@ int get_number_of_data_rows( struct dict *data ) {
     }
 
     return rows_in_column_1 ;
+}
+
+void _write_data_point( struct dict *data, FILE *file, char *data_point, int column_number ) {
+    fputs( data_point, file ) ;
+    if( column_number == ( data->keys.len - 1 ) ) {
+        fputs( "\n", file ) ; // final value only gets newline instead of comma
+    } else {
+        fputs( ",", file ) ;
+    }
 }
 
 void _load_data_lines( struct dict *data, FILE *data_file ) {
