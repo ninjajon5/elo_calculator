@@ -6,6 +6,7 @@
 
 void _write_dict_with_write_row_function( struct dict *data, char *path, void (*_write_row)( struct dict*, FILE*, int ) ) ;
 void _write_headers( struct dict *data, FILE *file ) ;
+void _write_dict_row( struct dict *data, FILE *file, int row_number ) ;
 void _write_data_dict_row( struct dict *data, FILE *file, int row_number ) ;
 void _write_data_dict_point( struct dict *data, FILE *file, char *data_point, int column_number ) ;
 void _load_data_lines( struct dict *data, FILE *data_file ) ;
@@ -45,6 +46,10 @@ struct dict load_data( char *path ) {
 
     fclose( data_file ) ;
     return data ;
+}
+
+void write_dict( struct dict *data, char *path ) {
+    _write_dict_with_write_row_function( data, path, _write_dict_row ) ;
 }
 
 void write_data_dict( struct dict *data, char *path ) {
@@ -93,6 +98,13 @@ int get_number_of_data_rows( struct dict *data ) {
 void _write_headers( struct dict *data, FILE *file ) {
     for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
         char *value = data->keys.contents[ column_number ] ;
+        _write_data_dict_point( data, file, value, column_number ) ;
+    }
+}
+
+void _write_dict_row( struct dict *data, FILE *file, int row_number ) {
+    for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
+        char *value = data->values.contents[ column_number ] ;
         _write_data_dict_point( data, file, value, column_number ) ;
     }
 }
