@@ -384,10 +384,10 @@ int _13_test_all_boost_combinations_return_correct_elos( void ) {
     return 1 ;
 }
 
-int _14_test_write_data_writes_basic_csv( void ) {
+int _14_test_write_data_dict_writes_basic_csv( void ) {
     struct dict data = load_data( "test_two_data_rows.csv" ) ;
 
-    char *test_file_path = "test_write_data.csv" ;
+    char *test_file_path = "test_write_data_dict.csv" ;
 
     write_data_dict( &data, test_file_path ) ;
 
@@ -418,6 +418,45 @@ int _14_test_write_data_writes_basic_csv( void ) {
     return 1 ;
 }
 
+int _15_test_write_dict_writes_basic_csv( void ) {
+    char *test_keys[2] = { "key_1", "key_2" } ;
+    int test_values[2] = { 1, 2 } ;
+
+    struct dict test_dict ;
+    dict_init( &test_dict ) ;
+
+    for ( int i = 0 ; i < 2 ; i ++ ) {
+        dict_add( 
+            &test_dict, 
+            test_keys[i], &test_values[i], 
+            strlen(test_keys[i]) + 1, sizeof(test_values[i]) 
+        ) ;
+    }   
+
+    char *test_file_path = "test_write_dict.csv" ;
+
+    write_dict( &test_dict, test_file_path ) ;
+
+    FILE *test_file = fopen( test_file_path, "r" ) ;
+    char line_1[ 32 ] ;
+    char line_2[ 32 ] ;
+    fgets( line_1, sizeof( line_1 ), test_file ) ;
+    fgets( line_2, sizeof( line_2 ), test_file ) ;
+
+    TASSERT(
+        strcmp( line_1, "key_1,1\n" ) == 0,
+        "Expected line 1 to contain 'key_1,1'"
+    ) ;
+
+    TASSERT(
+        strcmp( line_2, "key_2,2\n" ) == 0,
+        "Expected line 2 to contain 'key_2,2'"
+    ) ;
+
+    dict_free_with_nested_sarrs( &test_dict ) ;
+    return 1 ;
+}
+
 
 test_function tests[] = {
     _1_test_print_prints_file_contents,
@@ -433,7 +472,8 @@ test_function tests[] = {
     _11_test_multiple_matches_with_all_headers_returns_correct_elos,
     _12_test_straight_set_matches_return_boosted_elos,
     _13_test_all_boost_combinations_return_correct_elos,
-    _14_test_write_data_writes_basic_csv
+    _14_test_write_data_dict_writes_basic_csv,
+    _15_test_write_dict_writes_basic_csv
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 
