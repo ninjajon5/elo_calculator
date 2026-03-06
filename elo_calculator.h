@@ -33,6 +33,7 @@ struct elo_data_row {
 void elo_init( struct elo_calculator *elo ) ;
 void elo_load_data( struct elo_calculator *elo, char *path ) ;
 void elo_calculate_from_data( struct elo_calculator *elo, struct elo_config *config ) ;
+void elo_write_elos( struct elo_calculator *elo, char *path ) ;
 void elo_free( struct elo_calculator *elo ) ;
 
 #endif

@@ -49,6 +49,10 @@ void elo_calculate_from_data( struct elo_calculator *elo, struct elo_config *con
     }
 }
 
+void elo_write_elos( struct elo_calculator *elo, char *path ) {
+    // write_dict( &elo->elos, path ) ;
+}
+
 void elo_free( struct elo_calculator *elo ) {
     dict_free_with_nested_sarrs( &elo->data ) ;
     dict_free( &elo->elos ) ;
@@ -247,3 +251,23 @@ int _elo_get_number_of_data_rows( struct elo_calculator *elo ) {
 
     return rows_in_column_1 ;
 }
+
+
+// int main( void ) {
+//     struct elo_calculator elo_calculator ;
+//     elo_init( &elo_calculator ) ;
+
+//     struct elo_config elo_config = {
+//         .starting_elo = 1000.0f,
+//         .diff_factor = 400.0f,
+//         .k = 32.0f,
+//         .boost_threshold = 1.0f,
+//         .k_scaling = 1.25f
+//     } ;
+
+//     elo_load_data( &elo_calculator, "matches_database.csv" ) ;
+//     elo_calculate_from_data( &elo_calculator, &elo_config ) ;
+//     elo_write_elos( &elo_calculator, "elos.csv" ) ;
+
+//     elo_free( &elo_calculator ) ;
+// }

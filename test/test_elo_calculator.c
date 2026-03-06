@@ -389,7 +389,7 @@ int _14_test_write_data_writes_basic_csv( void ) {
 
     char *test_file_path = "test_write_data.csv" ;
 
-    write_data( &data, test_file_path ) ;
+    write_data_dict( &data, test_file_path ) ;
 
     FILE *test_file = fopen( test_file_path, "r" ) ;
     char line_1[ 32 ] ;
