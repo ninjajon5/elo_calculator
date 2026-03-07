@@ -418,9 +418,9 @@ int _14_test_write_data_dict_writes_basic_csv( void ) {
     return 1 ;
 }
 
-int _15_test_write_dict_writes_basic_csv( void ) {
+int _15_test_write_float_dict_writes_basic_csv( void ) {
     char *test_keys[2] = { "key_1", "key_2" } ;
-    int test_values[2] = { 1, 2 } ;
+    float test_values[2] = { 1.0f, 2.0f } ;
 
     struct dict test_dict ;
     dict_init( &test_dict ) ;
@@ -435,7 +435,7 @@ int _15_test_write_dict_writes_basic_csv( void ) {
 
     char *test_file_path = "test_write_dict.csv" ;
 
-    write_dict( &test_dict, test_file_path ) ;
+    write_float_dict( &test_dict, test_file_path ) ;
 
     FILE *test_file = fopen( test_file_path, "r" ) ;
     char line_1[ 32 ] ;
@@ -444,16 +444,16 @@ int _15_test_write_dict_writes_basic_csv( void ) {
     fgets( line_2, sizeof( line_2 ), test_file ) ;
 
     TASSERT(
-        strcmp( line_1, "key_1,1\n" ) == 0,
-        "Expected line 1 to contain 'key_1,1'"
+        strcmp( line_1, "key_1,1.00\n" ) == 0,
+        "Expected line 1 to contain 'key_1,1.00'"
     ) ;
 
     TASSERT(
-        strcmp( line_2, "key_2,2\n" ) == 0,
-        "Expected line 2 to contain 'key_2,2'"
+        strcmp( line_2, "key_2,2.00\n" ) == 0,
+        "Expected line 2 to contain 'key_2,2.00'"
     ) ;
 
-    dict_free_with_nested_sarrs( &test_dict ) ;
+    dict_free( &test_dict ) ;
     return 1 ;
 }
 
@@ -473,7 +473,7 @@ test_function tests[] = {
     _12_test_straight_set_matches_return_boosted_elos,
     _13_test_all_boost_combinations_return_correct_elos,
     _14_test_write_data_dict_writes_basic_csv,
-    _15_test_write_dict_writes_basic_csv
+    _15_test_write_float_dict_writes_basic_csv
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 

@@ -4,11 +4,11 @@
 #include "sarr.h"
 #include "dict.h"
 
-void _write_dict_with_write_row_function( struct dict *data, char *path, void (*_write_row)( struct dict*, FILE*, int ) ) ;
+void _write_data_rows( struct dict *data, FILE *file, int number_of_rows, void (*_write_row)( struct dict*, FILE*, int ) ) ;
 void _write_headers( struct dict *data, FILE *file ) ;
-void _write_dict_row( struct dict *data, FILE *file, int row_number ) ;
+void _write_float_dict_row( struct dict *data, FILE *file, int row_number ) ;
 void _write_data_dict_row( struct dict *data, FILE *file, int row_number ) ;
-void _write_data_dict_point( struct dict *data, FILE *file, char *data_point, int column_number ) ;
+void _write_data_point( struct dict *data, FILE *file, char *data_point, int column_number ) ;
 void _load_data_lines( struct dict *data, FILE *data_file ) ;
 void _load_data_line( struct dict *data, char *line, int *linecount ) ;
 void _load_headers_into_keys( struct dict *data, struct sarr *line_data ) ;
@@ -48,20 +48,20 @@ struct dict load_data( char *path ) {
     return data ;
 }
 
-void write_dict( struct dict *data, char *path ) {
-    _write_dict_with_write_row_function( data, path, _write_dict_row ) ;
-}
-
-void write_data_dict( struct dict *data, char *path ) {
-    _write_dict_with_write_row_function( data, path, _write_data_dict_row ) ;
-}
-
-void _write_dict_with_write_row_function( struct dict *data, char *path, void (*_write_row)( struct dict*, FILE*, int ) ) {
-    if( data->values.len != data->keys.len ) {
-        printf( "write_data_dict: data values len != data keys len" ) ;
+void write_float_dict( struct dict *data, char *path ) {
+    FILE *file = fopen( path, "w" ) ;
+    if( file == NULL ) {
+        fprintf( stderr, "IO: failed to write file" ) ;
         exit( 1 ) ;
     }
 
+    int number_of_rows = data->keys.len ;
+    _write_data_rows( data, file, number_of_rows, _write_float_dict_row ) ;
+
+    fclose( file ) ;
+}
+
+void write_data_dict( struct dict *data, char *path ) {
     FILE *file = fopen( path, "w" ) ;
     if( file == NULL ) {
         fprintf( stderr, "IO: failed to write file" ) ;
@@ -69,13 +69,8 @@ void _write_dict_with_write_row_function( struct dict *data, char *path, void (*
     }
 
     int number_of_rows = get_number_of_data_rows( data ) ;
-    for( int row_number = 0 ; row_number <= number_of_rows ; row_number++ ) {
-        if( row_number == 0 ) {
-            _write_headers( data, file ) ;
-        } else {
-            _write_row( data, file, row_number ) ;
-        }
-    }
+    _write_headers( data, file ) ;
+    _write_data_rows( data, file, number_of_rows, _write_data_dict_row ) ;
 
     fclose( file ) ;
 }
@@ -95,29 +90,40 @@ int get_number_of_data_rows( struct dict *data ) {
     return rows_in_column_1 ;
 }
 
-void _write_headers( struct dict *data, FILE *file ) {
-    for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
-        char *value = data->keys.contents[ column_number ] ;
-        _write_data_dict_point( data, file, value, column_number ) ;
+void _write_data_rows( struct dict *data, FILE *file, int number_of_rows, void (*_write_row)( struct dict*, FILE*, int ) ) {
+    dict_validate( data ) ;
+    for( int row_number = 0 ; row_number < number_of_rows ; row_number++ ) {
+        _write_row( data, file, row_number ) ;
     }
 }
 
-void _write_dict_row( struct dict *data, FILE *file, int row_number ) {
+void _write_headers( struct dict *data, FILE *file ) {
     for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
-        char *value = data->values.contents[ column_number ] ;
-        _write_data_dict_point( data, file, value, column_number ) ;
+        char *value = data->keys.contents[ column_number ] ;
+        _write_data_point( data, file, value, column_number ) ;
     }
+}
+
+void _write_float_dict_row( struct dict *data, FILE *file, int row_number ) {
+    char *header = data->keys.contents[ row_number ] ;
+    float *value = data->values.contents[ row_number ] ;
+    char buffer[ 64 ] ;
+    snprintf( 
+        buffer, sizeof( buffer ),
+        "%s,%.2f\n", header, *value
+    ) ;
+    fputs( buffer, file ) ;
 }
 
 void _write_data_dict_row( struct dict *data, FILE *file, int row_number ) {
     for( int column_number = 0 ; column_number < data->keys.len ; column_number++ ) {
         struct sarr *column = data->values.contents[ column_number ] ;
-        char *value = column->contents[ row_number - 1 ] ; // subtract 1 to adjust for header row
-        _write_data_dict_point( data, file, value, column_number ) ;
+        char *value = column->contents[ row_number ] ;
+        _write_data_point( data, file, value, column_number ) ;
     }
 }
 
-void _write_data_dict_point( struct dict *data, FILE *file, char *data_point, int column_number ) {
+void _write_data_point( struct dict *data, FILE *file, char *data_point, int column_number ) {
     fputs( data_point, file ) ;
     if( column_number == ( data->keys.len - 1 ) ) {
         fputs( "\n", file ) ; // final value only gets newline instead of comma

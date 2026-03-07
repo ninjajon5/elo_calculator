@@ -44,6 +44,13 @@ void dict_free_with_nested_sarrs( struct dict *dict ) {
     dict_free ( dict ) ;
 }
 
+void dict_validate( struct dict *dict ) {
+    if( dict->values.len != dict->keys.len ) {
+        printf( "dict: values len != keys len" ) ;
+        exit( 1 ) ;
+    }
+}
+
 int _dict_find_key_index( struct dict *dict, char *input_key ) {
     for ( int i = 0 ; i < dict->keys.len ; i++ ) {
         char *key = (char*)dict->keys.contents[i] ;
