@@ -547,7 +547,7 @@ test_function tests[] = {
     _13_test_all_boost_combinations_return_correct_elos,
     _14_test_write_data_dict_writes_basic_csv,
     _15_test_write_float_dict_writes_basic_csv,
-    // _16_test_unsorted_matches_return_correct_elos,
+    _16_test_unsorted_matches_return_correct_elos,
     _17_test_sorting_returns_correct_indexes
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
