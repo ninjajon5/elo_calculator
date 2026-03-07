@@ -46,9 +46,9 @@ void elo_load_data( struct elo_calculator *elo, char *path ) {
 void elo_calculate_from_data( struct elo_calculator *elo, struct elo_config *config ) {
     int number_of_data_rows = _elo_get_number_of_data_rows( elo ) ;
     int ordered_row_indexes[ 2048 ] ;
-    _elo_get_sorted_row_indexes( elo, number_of_data_rows, &ordered_row_indexes ) ;
+    // _elo_get_sorted_row_indexes( elo, number_of_data_rows, ordered_row_indexes ) ;
     for( int i = 0 ; i < number_of_data_rows ; i++ ) {
-        _elo_update_elos( elo, config, ordered_row_indexes[i] ) ;
+        _elo_update_elos( elo, config, i ) ;
     }
 }
 
@@ -74,7 +74,17 @@ void _elo_get_row_data( struct elo_calculator *elo, struct elo_config *config, s
 }
 
 void _elo_get_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) {
-
+    struct sarr *dates = dict_get( &elo->data, "date" ) ;
+    ordered_row_indexes[0] = 0 ;
+    for( int i = 1 ; i < number_of_data_rows ; i++ ) {
+        char *row_date = dates->contents[ i ] ;
+        char *previous_row_date = dates->contents[ i - 1 ] ;
+        if( *row_date > *previous_row_date ) {
+            ordered_row_indexes[i] = i ;
+        } else {
+            ordered_row_indexes[i] = i ;
+        }
+    }
 }
 
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row ) {    

@@ -15,6 +15,7 @@ void _load_headers_into_keys( struct dict *data, struct sarr *line_data ) ;
 void _append_datapoints_into_values( struct dict *data, struct sarr *line_data ) ;
 struct sarr _get_headers( char *path ) ;
 struct sarr _divide_csv_line_into_strings( char *line ) ;
+void _skip_bom( FILE *file ) ;
 
 void print_data( char *path ) {
     FILE *input_file ;
@@ -42,6 +43,7 @@ struct dict load_data( char *path ) {
     dict_init( &data ) ;
 
     FILE *data_file = fopen( path, "r" ) ;
+    _skip_bom( data_file ) ;
     _load_data_lines( &data, data_file ) ;
 
     fclose( data_file ) ;
@@ -208,4 +210,15 @@ struct sarr _divide_csv_line_into_strings( char *line ) {
     }
  
     return strings ;
+}
+
+void _skip_bom( FILE *file ) {
+    unsigned char bom[3];
+    if (fread(bom, 1, 3, file) == 3) {
+        if (bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF) {
+            rewind(file);  // not a BOM, put the bytes back
+        }
+    } else {
+        rewind(file);  // file shorter than 3 bytes
+    }
 }
