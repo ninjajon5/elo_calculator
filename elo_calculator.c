@@ -44,6 +44,7 @@ void elo_load_data( struct elo_calculator *elo, char *path ) {
 
 void elo_calculate_from_data( struct elo_calculator *elo, struct elo_config *config ) {
     int number_of_data_rows = _elo_get_number_of_data_rows( elo ) ;
+    // int ordered_row_indexes[ 2048 ] = _elo_get_sorted_row_indexes( elo, number_of_data_rows ) ;
     for( int i = 0 ; i < number_of_data_rows ; i++ ) {
         _elo_update_elos( elo, config, i ) ;
     }
@@ -253,21 +254,21 @@ int _elo_get_number_of_data_rows( struct elo_calculator *elo ) {
 }
 
 
-int main( void ) {
-    struct elo_calculator elo_calculator ;
-    elo_init( &elo_calculator ) ;
+// int main( void ) {
+//     struct elo_calculator elo_calculator ;
+//     elo_init( &elo_calculator ) ;
 
-    struct elo_config elo_config = {
-        .starting_elo = 1000.0f,
-        .diff_factor = 400.0f,
-        .k = 32.0f,
-        .boost_threshold = 1.0f,
-        .k_scaling = 1.25f
-    } ;
+//     struct elo_config elo_config = {
+//         .starting_elo = 1000.0f,
+//         .diff_factor = 400.0f,
+//         .k = 32.0f,
+//         .boost_threshold = 1.0f,
+//         .k_scaling = 1.25f
+//     } ;
 
-    elo_load_data( &elo_calculator, "matches_database.csv" ) ;
-    elo_calculate_from_data( &elo_calculator, &elo_config ) ;
-    elo_write_elos( &elo_calculator, "elos.csv" ) ;
+//     elo_load_data( &elo_calculator, "matches_database.csv" ) ;
+//     elo_calculate_from_data( &elo_calculator, &elo_config ) ;
+//     elo_write_elos( &elo_calculator, "elos.csv" ) ;
 
-    elo_free( &elo_calculator ) ;
-}
+//     elo_free( &elo_calculator ) ;
+// }
