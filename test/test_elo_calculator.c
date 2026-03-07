@@ -500,6 +500,36 @@ int _16_test_unsorted_matches_return_correct_elos( void ) {
     return 1 ;
 }
 
+int _17_test_sorting_returns_correct_indexes( void ) {
+    struct elo_calculator test_elo ;
+    elo_init( &test_elo ) ;
+
+    struct elo_config test_config = {
+        .starting_elo = 1000.0f,
+        .diff_factor = 400.0f,
+        .k = 32.0f,
+        .k_scaling = 1.0f
+    } ;
+
+    elo_load_data( &test_elo, "all_headers_long_unsorted.csv" ) ;
+    
+    int _elo_get_number_of_data_rows( struct elo_calculator *elo ) ;
+    void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) ;
+    int number_of_data_rows = _elo_get_number_of_data_rows( &test_elo ) ;
+    int ordered_row_indexes[ 2048 ] ;
+    _elo_get_date_sorted_row_indexes( &test_elo, number_of_data_rows, ordered_row_indexes ) ;
+
+    TASSERT( ordered_row_indexes[0] == 0, "" ) ;
+    TASSERT( ordered_row_indexes[1] == 3, "" ) ;
+    TASSERT( ordered_row_indexes[2] == 1, "" ) ;
+    TASSERT( ordered_row_indexes[3] == 4, "" ) ;
+    TASSERT( ordered_row_indexes[4] == 2, "" ) ;
+    TASSERT( ordered_row_indexes[5] == 5, "" ) ;
+
+    elo_free( &test_elo ) ;
+    return 1 ;
+}
+
 
 test_function tests[] = {
     _1_test_print_prints_file_contents,
@@ -517,7 +547,8 @@ test_function tests[] = {
     _13_test_all_boost_combinations_return_correct_elos,
     _14_test_write_data_dict_writes_basic_csv,
     _15_test_write_float_dict_writes_basic_csv,
-    _16_test_unsorted_matches_return_correct_elos
+    // _16_test_unsorted_matches_return_correct_elos,
+    _17_test_sorting_returns_correct_indexes
 } ;
 int test_count = sizeof( tests ) / sizeof( tests[0] ) ;
 

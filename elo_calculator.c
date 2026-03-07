@@ -11,6 +11,8 @@ struct elo_config elo_config_default( void ) ;
 void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, int row_number ) ;
 void _elo_get_row_data( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *data_row, int row_number ) ;
 void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) ;
+int _elo_compare_DDMMYYYY_dates( char *date, char *base_date ) ;
+int _elo_compare_dates_by_offset( char *date, char *base_date, int offset, int end ) ;
 void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row, int row_number ) ;
 void _elo_add_player_names_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number, char *player_headers[2], char *player_names[2], struct sarr player_sarrs[2] ) ;
 void _elo_add_within_boost_threshold_to_row( struct elo_config *config, struct elo_data_row *row, char *player_names[2], struct sarr player_sarrs[2], int row_number ) ;
@@ -79,17 +81,82 @@ void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of
         ordered_row_indexes[0] = 0 ;
         for( int i = 1 ; i < number_of_data_rows ; i++ ) {
             char *row_date = dates->contents[ i ] ;
-            char *previous_row_date = dates->contents[ i - 1 ] ;
-            if( *row_date > *previous_row_date ) {
+            char *previous_row_date = dates->contents[ ordered_row_indexes[ i - 1 ] ] ;
+            if( _elo_compare_DDMMYYYY_dates( row_date, previous_row_date ) >= 0 ) {
                 ordered_row_indexes[i] = i ;
             } else {
-                ordered_row_indexes[i] = i ;
+                int target_index = i - 1 ;
+                while( target_index >= 0 ) {
+                    char *target_row_date = dates->contents[ ordered_row_indexes[ target_index ] ] ;
+                    if( _elo_compare_DDMMYYYY_dates( row_date, target_row_date ) >= 0 ) {
+                        break ;
+                    } else {
+                        ordered_row_indexes[ target_index + 1 ] = ordered_row_indexes[ target_index ] ;
+                        target_index -= 1 ;
+                    }
+                }
+                ordered_row_indexes[ target_index + 1 ] = i ;
             }
         }
     } else {
         for( int i = 1 ; i < number_of_data_rows ; i++ ) {
             ordered_row_indexes[i] = i ;
         }
+    }
+}
+
+int _elo_compare_DDMMYYYY_dates( char *date, char *base_date ) {
+    // DD/MM/YYYY
+    // 0123456789
+    int year_offset = 6 ;
+    int year_end = 9 ;
+    int year_comparison = _elo_compare_dates_by_offset( date, base_date, year_offset, year_end ) ;
+    if( year_comparison > 0 ) {
+        return 1 ;
+    } else if( year_comparison < 0 ) {
+        return -1 ;
+    }
+
+    int month_offset = 3 ;
+    int month_end = 4 ;
+    int month_comparison = _elo_compare_dates_by_offset( date, base_date, month_offset, month_end ) ;
+    if( month_comparison > 0 ) {
+        return 1 ;
+    } else if( month_comparison < 0 ) {
+        return -1 ;
+    }
+
+    int day_offset = 0 ;
+    int day_end = 1 ;
+    int day_comparison = _elo_compare_dates_by_offset( date, base_date, day_offset, day_end ) ;
+    if( day_comparison > 0 ) {
+        return 1 ;
+    } else if( day_comparison < 0 ) {
+        return -1 ;
+    } else {
+        return 0 ;
+    }
+}
+
+int _elo_compare_dates_by_offset( char *input_date, char *input_base_date, int offset, int end ) {
+    char date[ 256 ] ;
+    char base_date[ 256 ] ;
+    strcpy( date, input_date ) ;
+    strcpy( base_date, input_base_date ) ;
+    
+    char *date_section_string = date + offset ;
+    *( date + end + 1 ) = '\0' ;
+    int date_section = atoi( date_section_string ) ;
+
+    char *base_date_section_string = base_date + offset ;
+    int base_date_section = atoi( base_date_section_string ) ;
+
+    if( date_section > base_date_section ) {
+        return 1 ;
+    } else if ( date_section < base_date_section ) {
+        return - 1 ;
+    } else {
+        return 0 ;
     }
 }
 
