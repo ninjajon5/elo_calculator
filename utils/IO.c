@@ -112,6 +112,7 @@ void _write_float_dict_row( struct dict *data, FILE *file, int row_number ) {
         buffer, sizeof( buffer ),
         "%s,%.2f\n", header, *value
     ) ;
+    
     fputs( buffer, file ) ;
 }
 
