@@ -1,2 +1,4 @@
+Script for calculating elos for table tennis matches.
+
 Input: csv of matches  
-Output: elo for each player
+Output: csv with elo for each player
