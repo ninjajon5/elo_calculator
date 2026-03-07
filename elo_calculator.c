@@ -10,6 +10,7 @@ int _elo_get_number_of_data_rows( struct elo_calculator *elo ) ;
 struct elo_config elo_config_default( void ) ;
 void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, int row_number ) ;
 void _elo_get_row_data( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *data_row, int row_number ) ;
+void _elo_get_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) ;
 void _elo_add_player_names_and_within_boost_threshold_to_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row, int row_number ) ;
 void _elo_add_player_names_to_row( struct elo_calculator *elo, struct elo_data_row *row, int row_number, char *player_headers[2], char *player_names[2], struct sarr player_sarrs[2] ) ;
 void _elo_add_within_boost_threshold_to_row( struct elo_config *config, struct elo_data_row *row, char *player_names[2], struct sarr player_sarrs[2], int row_number ) ;
@@ -44,9 +45,10 @@ void elo_load_data( struct elo_calculator *elo, char *path ) {
 
 void elo_calculate_from_data( struct elo_calculator *elo, struct elo_config *config ) {
     int number_of_data_rows = _elo_get_number_of_data_rows( elo ) ;
-    // int ordered_row_indexes[ 2048 ] = _elo_get_sorted_row_indexes( elo, number_of_data_rows ) ;
+    int ordered_row_indexes[ 2048 ] ;
+    _elo_get_sorted_row_indexes( elo, number_of_data_rows, &ordered_row_indexes ) ;
     for( int i = 0 ; i < number_of_data_rows ; i++ ) {
-        _elo_update_elos( elo, config, i ) ;
+        _elo_update_elos( elo, config, ordered_row_indexes[i] ) ;
     }
 }
 
@@ -69,6 +71,10 @@ void _elo_get_row_data( struct elo_calculator *elo, struct elo_config *config, s
     data_row->row_number = row_number ;
     _elo_add_player_names_and_within_boost_threshold_to_row( elo, config, data_row, row_number ) ;
     _elo_add_winner_and_straight_sets_to_row( elo, data_row, row_number ) ;
+}
+
+void _elo_get_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) {
+
 }
 
 void _elo_update_elos_from_data_row( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *row ) {    
