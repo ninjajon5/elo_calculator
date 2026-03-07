@@ -50,7 +50,7 @@ void elo_calculate_from_data( struct elo_calculator *elo, struct elo_config *con
     int ordered_row_indexes[ 2048 ] ;
     _elo_get_date_sorted_row_indexes( elo, number_of_data_rows, ordered_row_indexes ) ;
     for( int i = 0 ; i < number_of_data_rows ; i++ ) {
-        _elo_update_elos( elo, config, i ) ;
+        _elo_update_elos( elo, config, ordered_row_indexes[i] ) ;
     }
 }
 
@@ -81,25 +81,20 @@ void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of
         ordered_row_indexes[0] = 0 ;
         for( int i = 1 ; i < number_of_data_rows ; i++ ) {
             char *row_date = dates->contents[ i ] ;
-            char *previous_row_date = dates->contents[ ordered_row_indexes[ i - 1 ] ] ;
-            if( _elo_compare_DDMMYYYY_dates( row_date, previous_row_date ) >= 0 ) {
-                ordered_row_indexes[i] = i ;
-            } else {
-                int target_index = i - 1 ;
-                while( target_index >= 0 ) {
-                    char *target_row_date = dates->contents[ ordered_row_indexes[ target_index ] ] ;
-                    if( _elo_compare_DDMMYYYY_dates( row_date, target_row_date ) >= 0 ) {
-                        break ;
-                    } else {
-                        ordered_row_indexes[ target_index + 1 ] = ordered_row_indexes[ target_index ] ;
-                        target_index -= 1 ;
-                    }
+            int target_index = i - 1 ;
+            while( target_index >= 0 ) {
+                char *target_row_date = dates->contents[ ordered_row_indexes[ target_index ] ] ;
+                if( _elo_compare_DDMMYYYY_dates( row_date, target_row_date ) >= 0 ) {
+                    break ;
+                } else {
+                    ordered_row_indexes[ target_index + 1 ] = ordered_row_indexes[ target_index ] ;
+                    target_index -= 1 ;
                 }
-                ordered_row_indexes[ target_index + 1 ] = i ;
             }
+            ordered_row_indexes[ target_index + 1 ] = i ;
         }
     } else {
-        for( int i = 1 ; i < number_of_data_rows ; i++ ) {
+        for( int i = 0 ; i < number_of_data_rows ; i++ ) {
             ordered_row_indexes[i] = i ;
         }
     }
