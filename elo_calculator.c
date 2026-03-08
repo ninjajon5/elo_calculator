@@ -89,7 +89,6 @@ void _elo_sort( struct elo_calculator *elo, int number_of_data_rows, int *ordere
 
 void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) {
     struct sarr *dates = dict_get( &elo->data, "date" ) ;
-    ordered_row_indexes[0] = 0 ;
     for( int row_number = 1 ; row_number < number_of_data_rows ; row_number++ ) {
         char *row_date = dates->contents[ row_number ] ;
         _elo_sort_row_date( row_date, dates, row_number, ordered_row_indexes ) ;
@@ -97,12 +96,13 @@ void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of
 }
 
 void _elo_sort_row_date( char *row_date, struct sarr *dates, int row_number, int *ordered_row_indexes ) {
-    int target_index = row_number - 1 ;
+    int target_index = row_number - 1 ; // start by comparing row_date to the date immediately above
+    ordered_row_indexes[0] = 0 ;
     while( target_index >= 0 ) {
         char *target_row_date = dates->contents[ ordered_row_indexes[ target_index ] ] ;
         if( _elo_compare_DDMMYYYY_dates( row_date, target_row_date ) >= 0 ) {
             break ;
-        } else {
+        } else { // if date is before target date, shift the target date's index, then shift the index to compare to the date above
             ordered_row_indexes[ target_index + 1 ] = ordered_row_indexes[ target_index ] ;
             target_index -= 1 ;
         }
