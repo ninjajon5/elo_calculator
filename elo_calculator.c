@@ -10,6 +10,7 @@ int _elo_get_number_of_data_rows( struct elo_calculator *elo ) ;
 struct elo_config elo_config_default( void ) ;
 void _elo_update_elos( struct elo_calculator *elo, struct elo_config *config, int row_number ) ;
 void _elo_get_row_data( struct elo_calculator *elo, struct elo_config *config, struct elo_data_row *data_row, int row_number ) ;
+void _elo_sort( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) ;
 void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) ;
 int _elo_compare_DDMMYYYY_dates( char *date, char *base_date ) ;
 int _elo_compare_dates_by_offset( char *date, char *base_date, int offset, int end ) ;
@@ -48,7 +49,7 @@ void elo_load_data( struct elo_calculator *elo, char *path ) {
 void elo_calculate_from_data( struct elo_calculator *elo, struct elo_config *config ) {
     int number_of_data_rows = _elo_get_number_of_data_rows( elo ) ;
     int ordered_row_indexes[ 2048 ] ;
-    _elo_get_date_sorted_row_indexes( elo, number_of_data_rows, ordered_row_indexes ) ;
+    _elo_sort( elo, number_of_data_rows, ordered_row_indexes ) ;
     for( int i = 0 ; i < number_of_data_rows ; i++ ) {
         _elo_update_elos( elo, config, ordered_row_indexes[i] ) ;
     }
@@ -75,28 +76,32 @@ void _elo_get_row_data( struct elo_calculator *elo, struct elo_config *config, s
     _elo_add_winner_and_straight_sets_to_row( elo, data_row, row_number ) ;
 }
 
-void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) {
+void _elo_sort( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) {
     if( dict_has_key( &elo->data, "date" ) ) {
-        struct sarr *dates = dict_get( &elo->data, "date" ) ;
-        ordered_row_indexes[0] = 0 ;
-        for( int i = 1 ; i < number_of_data_rows ; i++ ) {
-            char *row_date = dates->contents[ i ] ;
-            int target_index = i - 1 ;
-            while( target_index >= 0 ) {
-                char *target_row_date = dates->contents[ ordered_row_indexes[ target_index ] ] ;
-                if( _elo_compare_DDMMYYYY_dates( row_date, target_row_date ) >= 0 ) {
-                    break ;
-                } else {
-                    ordered_row_indexes[ target_index + 1 ] = ordered_row_indexes[ target_index ] ;
-                    target_index -= 1 ;
-                }
-            }
-            ordered_row_indexes[ target_index + 1 ] = i ;
-        }
+        _elo_get_date_sorted_row_indexes( elo, number_of_data_rows, ordered_row_indexes ) ;
     } else {
         for( int i = 0 ; i < number_of_data_rows ; i++ ) {
             ordered_row_indexes[i] = i ;
         }
+    }
+}
+
+void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) {
+    struct sarr *dates = dict_get( &elo->data, "date" ) ;
+    ordered_row_indexes[0] = 0 ;
+    for( int i = 1 ; i < number_of_data_rows ; i++ ) {
+        char *row_date = dates->contents[ i ] ;
+        int target_index = i - 1 ;
+        while( target_index >= 0 ) {
+            char *target_row_date = dates->contents[ ordered_row_indexes[ target_index ] ] ;
+            if( _elo_compare_DDMMYYYY_dates( row_date, target_row_date ) >= 0 ) {
+                break ;
+            } else {
+                ordered_row_indexes[ target_index + 1 ] = ordered_row_indexes[ target_index ] ;
+                target_index -= 1 ;
+            }
+        }
+        ordered_row_indexes[ target_index + 1 ] = i ;
     }
 }
 

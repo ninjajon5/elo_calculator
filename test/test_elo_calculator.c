@@ -514,10 +514,10 @@ int _17_test_sorting_returns_correct_indexes( void ) {
     elo_load_data( &test_elo, "all_headers_long_unsorted.csv" ) ;
     
     int _elo_get_number_of_data_rows( struct elo_calculator *elo ) ;
-    void _elo_get_date_sorted_row_indexes( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) ;
+    void _elo_sort( struct elo_calculator *elo, int number_of_data_rows, int *ordered_row_indexes ) ;
     int number_of_data_rows = _elo_get_number_of_data_rows( &test_elo ) ;
     int ordered_row_indexes[ 2048 ] ;
-    _elo_get_date_sorted_row_indexes( &test_elo, number_of_data_rows, ordered_row_indexes ) ;
+    _elo_sort( &test_elo, number_of_data_rows, ordered_row_indexes ) ;
 
     TASSERT( ordered_row_indexes[0] == 0, "" ) ;
     TASSERT( ordered_row_indexes[1] == 3, "" ) ;
